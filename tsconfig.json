@@ -2,15 +2,11 @@
   "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "sourceMap": true,  
+    "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    // "allowJs": true
+    "module": "Node16"
   },
-  "include": [
-  "src/**/*",
-  "utils/**/*",
-  "types/**/*",
-  "*.json"],
+  "include": ["src/**/*", "utils/**/*", "types/**/*", "*.json"],
   "exclude": ["node_modules"]
 }

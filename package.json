@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && node dist/src/index.ts"
+    "build": "tsc",
+    "start": "node dist/src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +16,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
-    "nanoid": "3.3.7"
+    "nanoid": "3.3.7",
+    "tslog": "^4.9.3"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
