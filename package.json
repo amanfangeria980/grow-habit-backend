@@ -12,7 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.1"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "firebase-admin": "^13.0.2",
+    "nanoid": "^5.0.9"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
