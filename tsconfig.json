@@ -3,6 +3,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "sourceMap": true,  
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     // "allowJs": true
   },
   "include": ["src/**/*"],
