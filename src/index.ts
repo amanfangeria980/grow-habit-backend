@@ -4,6 +4,7 @@ dotenv.config();
 import db from "../utils/firebase";
 import cors from "cors";
 import { nanoid } from "nanoid";
+import { sendMessageText } from "../utils/functions";
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -168,6 +169,15 @@ app.get("/get-reflections", async (req, res) => {
         });
     }
 });
+
+// Get Whatsapp Message - POST
+app.get("/send-whatsapp-message", async (req, res) => {
+    const reqData = req.body;
+    const sendData = reqData.data;
+    const { phoneNumber, data } = reqData;
+    sendMessageText(phoneNumber, data);
+});
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
