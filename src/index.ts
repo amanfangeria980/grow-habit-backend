@@ -136,6 +136,38 @@ app.post("/get-two-pointer-status", async (req, res) => {
     }
 });
 
+// Get Reflections - GET
+
+app.get("/get-reflections", async (req, res) => {
+    try {
+        const reflectionsSnapshot = await db
+            .collection("reflections")
+            .orderBy("testDay")
+            .get();
+
+        let reflectionsData: any = [];
+
+        reflectionsSnapshot.docs.forEach((ref) => {
+            let newValue = {
+                id: ref.id,
+                ...ref.data(),
+            };
+            reflectionsData.push(newValue);
+        });
+        res.send({
+            message: "Everything is cool",
+            data: reflectionsData,
+        });
+    } catch (error) {
+        console.log(
+            "There is an error on backend side in (get) /get-reflections",
+            error
+        );
+        res.send({
+            message: "There is something wrong at (get) /get-reflections",
+        });
+    }
+});
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
