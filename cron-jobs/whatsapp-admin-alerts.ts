@@ -2,8 +2,7 @@ import cron from "node-cron";
 import calculateTwoPointerStatusAdmin from "../utils/calculateTwoPointerStatusAdmin";
 
 export const adminTwoPointerStatusAlertMorning = cron.schedule(
-    // "0 10 * * *",
-    "50 19 * * *",
+    "0 10 * * *",
     async () => {
         const phoneNumbers = process.env.PHONE_NUMBER;
         const day = new Date(Date.now()).getDate();
