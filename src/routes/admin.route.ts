@@ -5,10 +5,10 @@ import {
     getReflections,
 } from "../controllers/admin.controller";
 
-const router = express.Router();
+const adminRouter = express.Router();
 
-router.post("/reflect", createReflection);
-router.post("/get-two-pointer-status", getTwoPointerStatus);
-router.get("/get-reflections", getReflections);
+adminRouter.post("/reflect", createReflection);
+adminRouter.post("/get-two-pointer-status", getTwoPointerStatus);
+adminRouter.get("/get-reflections", getReflections);
 
-export default router;
+export default adminRouter;

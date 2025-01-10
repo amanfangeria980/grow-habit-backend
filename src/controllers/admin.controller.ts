@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import db from "../../utils/firebase";
 import { nanoid } from "nanoid";
 
+// Create and store reflections in the database
 export const createReflection = async (req: Request, res: Response) => {
     const reqData = req.body;
     const id = nanoid();
@@ -18,6 +19,7 @@ export const createReflection = async (req: Request, res: Response) => {
     });
 };
 
+// Calculate the two pointer status of all the users
 export const getTwoPointerStatus = async (req: Request, res: Response) => {
     const reqData = req.body;
     console.log("This is the value of reqData ", reqData);
@@ -119,6 +121,7 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
     }
 };
 
+// Get all the reflections from the database
 export const getReflections = async (req: Request, res: Response) => {
     try {
         const reflectionsSnapshot = await db

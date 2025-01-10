@@ -1,7 +1,7 @@
 import express from "express";
 import { sendTextMessage } from "../controllers/whatsapp.controller";
 
-const router = express.Router();
-router.post("/send-text-message", sendTextMessage);
+const whatsappRouter = express.Router();
+whatsappRouter.post("/send-text-message", sendTextMessage);
 
-export default router;
+export default whatsappRouter;
