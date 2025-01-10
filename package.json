@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && node dist/src/index.ts"
+    "build": "tsc && node dist/src/index.ts",
+    "migrate": "prisma migrate dev"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.3",
     "firebase-admin": "^13.0.2",
+    "prisma": "^6.2.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
