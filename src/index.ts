@@ -3,6 +3,11 @@ import dotenv from "dotenv";
 import cors from "cors";
 import adminRoutes from "./routes/admin.route";
 import whatsappRoutes from "./routes/whatsapp.route";
+import { adminTwoPointerStatusAlertMorning } from "../cron-jobs/whatsapp-admin-alerts";
+
+adminTwoPointerStatusAlertMorning.start();
+
+console.log("Cron job for Two Pointer Status Alert Morning has been started.");
 
 dotenv.config();
 

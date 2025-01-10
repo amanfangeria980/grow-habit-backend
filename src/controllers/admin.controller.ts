@@ -22,10 +22,10 @@ export const createReflection = async (req: Request, res: Response) => {
 // Calculate the two pointer status of all the users
 export const getTwoPointerStatus = async (req: Request, res: Response) => {
     const reqData = req.body;
-    console.log("This is the value of reqData ", reqData);
+    // console.log("This is the value of reqData ", reqData);
     const { username, day } = reqData;
-    console.log("The value of username is ", username);
-    console.log("The value of day is ", day);
+    // console.log("The value of username is ", username);
+    // console.log("The value of day is ", day);
     let flag = true;
     let returnData = {
         dayYesterday: "",
@@ -34,8 +34,7 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
 
     if (username && day) {
         try {
-            console.log("I was here");
-
+            // console.log("I was here");
             const dayYesterdayDoc = await db
                 .collection("reflections")
                 .where("name", "==", username)
@@ -47,22 +46,22 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
                 let ctr = 0;
                 dayYesterdayDoc.forEach((doc) => {
                     const docData = doc.data();
-                    console.log("THe doc data is ", docData.commitment);
+                    // console.log("THe doc data is ", docData.commitment);
                     value = docData.commitment;
                     ctr++;
                 });
                 if (ctr === 1) {
                     returnData.dayYesterday = value;
                 } else {
-                    console.log(
-                        "The value is not set because there are multiple values "
-                    );
+                    // console.log(
+                    //     "The value is not set because there are multiple values "
+                    // );
                     flag = false;
                 }
             } else {
-                console.log(
-                    "The query you have used doesn't have a corresponding field in the database"
-                );
+                // console.log(
+                //     "The query you have used doesn't have a corresponding field in the database"
+                // );
                 flag = false;
             }
 
@@ -77,22 +76,22 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
                 let ctr = 0;
                 dayBeforeYesterdayDoc.forEach((doc) => {
                     const docData = doc.data();
-                    console.log("THe doc data is ", docData.commitment);
+                    // console.log("THe doc data is ", docData.commitment);
                     value = docData.commitment;
                     ctr++;
                 });
                 if (ctr === 1) {
                     returnData.dayBeforeYesterday = value;
                 } else {
-                    console.log(
-                        "The value is not set because there are multiple values "
-                    );
+                    // console.log(
+                    //     "The value is not set because there are multiple values "
+                    // );
                     flag = false;
                 }
             } else {
-                console.log(
-                    "The query you have used doesn't have a corresponding field in the database"
-                );
+                // console.log(
+                //     "The query you have used doesn't have a corresponding field in the database"
+                // );
                 flag = false;
             }
         } catch (error) {
