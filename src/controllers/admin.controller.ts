@@ -2,23 +2,6 @@ import { Request, Response } from "express";
 import db from "../../utils/firebase";
 import { nanoid } from "nanoid";
 
-// Create and store reflections in the database
-export const createReflection = async (req: Request, res: Response) => {
-    const reqData = req.body;
-    const id = nanoid();
-    const docRef = db.collection("reflections").doc(id);
-    console.log("This is value of data from frontend", reqData);
-    try {
-        await docRef.set(reqData);
-        console.log("new entry created with the id ", id);
-    } catch (error) {
-        console.log("There is an error at port/reflect ", error);
-    }
-    res.json({
-        message: "This all seems to work",
-    });
-};
-
 // Calculate the two pointer status of all the users
 export const getTwoPointerStatus = async (req: Request, res: Response) => {
     const reqData = req.body;
@@ -148,6 +131,44 @@ export const getReflections = async (req: Request, res: Response) => {
         );
         res.send({
             message: "There is something wrong at (get) /get-reflections",
+        });
+    }
+};
+
+// Delete a reflection
+export const deleteReflection = async (req: Request, res: Response) => {
+    const reqData = req.body;
+    const data = reqData.data;
+    console.log("This is the value of data from frontend ", data);
+
+    try {
+        const targetDoc = await db
+            .collection("reflections")
+            .where("timestamp", "==", data.timestamp)
+            .get();
+
+        if (targetDoc.empty) {
+            return res.json({
+                message: "Please send a valid reflection to be deleted",
+            });
+        }
+
+        // Note : logically there should be only one entry for one field but still I am considering that there could be multiple and written the code for it
+
+        targetDoc.forEach(async (doc) => {
+            await db.collection("reflections").doc(doc.id).delete();
+        });
+
+        return res.json({
+            message: `Your reflection with id : ${data.id} on day ${data.testDay} of user : ${data.name} is deleted successfully`,
+        });
+    } catch (error) {
+        console.log(
+            "There is an error at admin/delete-reflection route ",
+            error
+        );
+        return res.json({
+            message: `There is an error at admin/delete-reflection route  : ${error}`,
         });
     }
 };
