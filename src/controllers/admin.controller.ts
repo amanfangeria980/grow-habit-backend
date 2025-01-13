@@ -148,9 +148,10 @@ export const deleteReflection = async (req: Request, res: Response) => {
             .get();
 
         if (targetDoc.empty) {
-            return res.json({
+            res.json({
                 message: "Please send a valid reflection to be deleted",
             });
+            return;
         }
 
         // Note : logically there should be only one entry for one field but still I am considering that there could be multiple and written the code for it
@@ -159,16 +160,18 @@ export const deleteReflection = async (req: Request, res: Response) => {
             await db.collection("reflections").doc(doc.id).delete();
         });
 
-        return res.json({
+        res.json({
             message: `Your reflection with id : ${data.id} on day ${data.testDay} of user : ${data.name} is deleted successfully`,
         });
+        return;
     } catch (error) {
         console.log(
             "There is an error at admin/delete-reflection route ",
             error
         );
-        return res.json({
+        res.json({
             message: `There is an error at admin/delete-reflection route  : ${error}`,
         });
+        return;
     }
 };
