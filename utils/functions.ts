@@ -37,6 +37,8 @@ export const sendMessageText = async (phoneNumbers: number, finStatus: any) => {
 
     // Create formatted message with title and emojis
     const title = `*Two Pointer Status - ${dateTitle}*\n\n`;
+    const footer =
+        "🐤 - Means You are going good.\n🦀 - Means You missed yesterday and need to do it today in order to avoid a fine.\n❌ - Means you are fined.\n🌶 - Pending Fine\nP & E - Plus & Elite respectively";
     const formattedMessage = statusData
         .map((item: any) => {
             const emoji =
@@ -61,7 +63,7 @@ export const sendMessageText = async (phoneNumbers: number, finStatus: any) => {
             to: phoneNumbers,
             type: "text",
             text: {
-                body: title + formattedMessage,
+                body: title + formattedMessage + "\n\n" + footer,
             },
         }),
     });
