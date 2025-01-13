@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import db from "../../utils/firebase";
-import { nanoid } from "nanoid";
 
 // Calculate the two pointer status of all the users
 export const getTwoPointerStatus = async (req: Request, res: Response) => {
