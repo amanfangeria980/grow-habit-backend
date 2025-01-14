@@ -34,3 +34,47 @@ export const createReflection = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const getGraphData = async (req: Request, res: Response) => {
+    const { name } = req.params;
+
+    try {
+        const reflectionsSnapshot = await db
+            .collection("reflections")
+            .where("name", "==", name)
+            .orderBy("testDay")
+            .get();
+
+        let recordsArray = [];
+
+        // Create an array of 25 days initialized with "no" values
+        for (let i = 1; i <= 25; i++) {
+            recordsArray.push({ value: "no", day: i });
+        }
+
+        // Update the array with actual reflection data
+        reflectionsSnapshot.forEach((doc) => {
+            const data = doc.data();
+            const day = data.testDay;
+
+            if (day >= 1 && day <= 25) {
+                recordsArray[day - 1] = {
+                    value: data.commitment || "no",
+                    day: day,
+                };
+            }
+        });
+
+        res.json({
+            success: true,
+            data: recordsArray,
+        });
+    } catch (error) {
+        console.error("Error in /user-graph route:", error);
+        res.status(500).json({
+            success: false,
+            message: "An error occurred while fetching graph data",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
+    }
+};
