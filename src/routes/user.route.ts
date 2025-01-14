@@ -10,5 +10,21 @@ userRouter.post("/reflect", (req: Request, res: Response) => {
 userRouter.get("/user-graph/:name", (req: Request, res: Response) => {
     getGraphData(req, res);
 });
+userRouter.get("get-user-reflections", (req : Request, res : Response)=>{
+    const getUserReflections = async(req : Request, res : Response)=>{
+
+        const {username} = req.query ; 
+
+        console.log("this is the value of username", username) ; 
+
+        return res.json({
+            message : "This all seems to work"
+        })
+
+
+    }
+
+    getUserReflections(req, res)
+})
 
 export default userRouter;
