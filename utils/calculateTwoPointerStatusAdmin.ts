@@ -17,15 +17,22 @@ const calculateTwoPointerStatusAdmin = async (day: number) => {
             const repData: any = await response.json();
             let { dayYesterday, dayBeforeYesterday } = repData.data;
 
+            // Convert empty strings to "no"
             dayYesterday = dayYesterday === "" ? "no" : dayYesterday;
             dayBeforeYesterday =
                 dayBeforeYesterday === "" ? "no" : dayBeforeYesterday;
+
+            // Helper function to check valid status
+            const isValidStatus = (status: string) =>
+                ["gateway", "plus", "elite"].includes(status);
+
+            // Determine status based on conditions
             const status =
-                dayYesterday === "gateway" && dayBeforeYesterday === "gateway"
+                (isValidStatus(dayYesterday) &&
+                    isValidStatus(dayBeforeYesterday)) ||
+                (isValidStatus(dayYesterday) && dayBeforeYesterday === "no")
                     ? "duck"
-                    : dayYesterday === "gateway" && dayBeforeYesterday === "no"
-                    ? "duck"
-                    : dayYesterday === "no" && dayBeforeYesterday === "gateway"
+                    : dayYesterday === "no" && isValidStatus(dayBeforeYesterday)
                     ? "crab"
                     : "cross";
 
@@ -36,15 +43,17 @@ const calculateTwoPointerStatusAdmin = async (day: number) => {
         }
     };
 
-    // Fetch statuses for all users
+    // Fetch statuses for all users in parallel
     const userStatuses = await Promise.all(allUsers.map(fetchStatusForUser));
 
-    // Filter out any null results and add to finStatus
+    // Filter out null results and add valid statuses
     userStatuses
-        .filter((status: any) => status !== null)
-        .forEach((status: any) =>
-            finStatus.push(status as { username: string; status: string })
-        );
+        .filter(
+            (status): status is { username: string; status: string } =>
+                status !== null
+        )
+        .forEach((status) => finStatus.push(status));
+
     return finStatus;
 };
 
