@@ -8,6 +8,7 @@ import { nanoid } from "nanoid";
 import db from "../utils/firebase";
 import userRouter from "./routes/user.route";
 import authRoutes from "./routes/auth.route";
+import swagger from "../utils/swaggere";
 
 adminTwoPointerStatusAlertMorning.start();
 
@@ -23,8 +24,8 @@ app.use(cors());
 
 // Root Route
 app.get("/", (req: Request, res: Response) => {
-    console.log("Log: Serve is hit");
-    res.send("Welcome to the Grow Habit Backend!");
+  console.log("Log: Serve is hit");
+  res.send("Welcome to the Grow Habit Backend!");
 });
 
 // Admin Routes
@@ -39,6 +40,10 @@ app.use("/user", userRouter);
 // Auth Routes
 app.use("/auth", authRoutes);
 
+app.use("/assets", express.static("public/assets"));
+
+swagger(app);
+
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
