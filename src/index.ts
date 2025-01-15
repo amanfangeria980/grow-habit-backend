@@ -7,6 +7,7 @@ import { adminTwoPointerStatusAlertMorning } from "../cron-jobs/whatsapp-admin-a
 import { nanoid } from "nanoid";
 import db from "../utils/firebase";
 import userRouter from "./routes/user.route";
+import authRoutes from "./routes/auth.route";
 
 adminTwoPointerStatusAlertMorning.start();
 
@@ -34,6 +35,9 @@ app.use("/whatsapp", whatsappRoutes);
 
 // User Routes
 app.use("/user", userRouter);
+
+// Auth Routes
+app.use("/auth", authRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
