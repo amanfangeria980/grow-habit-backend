@@ -45,7 +45,7 @@ module.exports = {
     sendEmail,
 };
 
-// const { sendEmail } = require('./utils/email');
+// const { sendEmail } = require('../utils/email');
 
 // sendEmail({
 //     to: 'vidyaashram.edu@gmail.com',
