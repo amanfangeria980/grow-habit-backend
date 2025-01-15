@@ -8,6 +8,8 @@ import { nanoid } from "nanoid";
 import db from "../utils/firebase";
 import userRouter from "./routes/user.route";
 import authRoutes from "./routes/auth.route";
+import logger from "../utils/logger";
+import morgan from "morgan";
 
 adminTwoPointerStatusAlertMorning.start();
 
@@ -15,16 +17,34 @@ console.log("Cron job for Two Pointer Status Alert Morning has been started.");
 
 dotenv.config();
 
+const morganFormat = ":method :url :status :response-time ms";
+
 const app: Express = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
 
+app.use(
+  morgan(morganFormat, {
+    stream: {
+      write: (message: string) => {
+        const logObject = {
+          method: message.split(" ")[0],
+          url: message.split(" ")[1],
+          status: message.split(" ")[2],
+          responseTime: message.split(" ")[3],
+        };
+        logger.info(JSON.stringify(logObject));
+      },
+    },
+  })
+);
+
 // Root Route
 app.get("/", (req: Request, res: Response) => {
-    console.log("Log: Serve is hit");
-    res.send("Welcome to the Grow Habit Backend!");
+  console.log("Log: Serve is hit");
+  res.send("Welcome to the Grow Habit Backend!");
 });
 
 // Admin Routes
@@ -40,5 +60,5 @@ app.use("/user", userRouter);
 app.use("/auth", authRoutes);
 
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
