@@ -12,8 +12,6 @@ const transporter = nodemailer.createTransport({
     },
 } as nodemailer.TransportOptions);
 
-// const { sendEmail } = require('../utils/email');
-
 // sendEmail({
 //     to: 'vidyaashram.edu@gmail.com',
 //     subject: 'Test Email',
