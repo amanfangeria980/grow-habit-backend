@@ -22,9 +22,10 @@ app.use(express.json());
 app.use(cors());
 
 // Root Route
-app.get('/', (req: Request, res: Response) => {
-    console.log('Log: Serve is hit');
-    res.send('Welcome to the Grow Habit Backend!');
+app.get("/", (req: Request, res: Response) => {
+    console.log("Log: Serve is hit");
+    
+    res.send("Welcome to the Grow Habit Backend!");
 });
 
 // Admin Routes

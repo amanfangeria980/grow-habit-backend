@@ -49,7 +49,7 @@ export const getGraphData = async (req: Request, res: Response) => {
 
         // Create an array of 25 days initialized with "no" values
         for (let i = 1; i <= 25; i++) {
-            recordsArray.push({ value: "no", day: i });
+            recordsArray.push({ value: "undefined", day: i });
         }
 
         // Update the array with actual reflection data
@@ -59,7 +59,7 @@ export const getGraphData = async (req: Request, res: Response) => {
 
             if (day >= 1 && day <= 25) {
                 recordsArray[day - 1] = {
-                    value: data.commitment || "no",
+                    value: data.commitment || "undefined",
                     day: day,
                 };
             }
