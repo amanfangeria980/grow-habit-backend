@@ -3,7 +3,7 @@ import db from "../../utils/firebase";
 import { nanoid } from "nanoid";
 
 export const registerUser = async (req: Request, res: Response) => {
-    const { fullName, email, password } = req.body;
+    const { fullName, email, password, phoneNumber, countryCode } = req.body;
     const id = nanoid();
 
     try {
@@ -25,14 +25,71 @@ export const registerUser = async (req: Request, res: Response) => {
             id,
             fullName,
             email,
-            password, // Note: In production, this should be hashed
+            phoneNumber,
+            countryCode,
+            profileImage: "",
+            // hash the password
+            password,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+
+        const result = await db.collection("users").doc(id).set(userDoc);
+        console.log("User registered successfully", result);
+        return res.status(201).json({
+            success: true,
+            message: "User registered successfully",
+            user: {
+                id,
+                fullName,
+                email,
+                phoneNumber,
+                countryCode,
+            },
+        });
+    } catch (error) {
+        console.error("Error registering user:", error);
+        return res.status(500).json({
+            success: false,
+            message: "An error occurred while registering user",
+            error: error instanceof Error ? error.message : "Unknown error",
+        });
+    }
+};
+
+export const registerUserByGoogleLogin = async (
+    req: Request,
+    res: Response
+) => {
+    const { fullName, email, id, image } = req.body;
+
+    try {
+        // Check if user already exists
+        const existingUser = await db
+            .collection("users")
+            .where("email", "==", email)
+            .get();
+
+        if (!existingUser.empty) {
+            return res.status(400).json({
+                success: false,
+                message: "User with this email already exists",
+            });
+        }
+
+        // Create new user document
+        const userDoc = {
+            id,
+            fullName,
+            email,
+            profileImage: image,
+            password: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
 
         const result = await db.collection("users").doc(id).set(userDoc);
         console.log("result", result);
-
         return res.status(201).json({
             success: true,
             message: "User registered successfully",
@@ -54,7 +111,6 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const signInUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
-
     try {
         // Check if user exists
         const userSnapshot = await db
@@ -65,7 +121,8 @@ export const signInUser = async (req: Request, res: Response) => {
         if (userSnapshot.empty) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid email or password",
+                // message: "Invalid email or password",
+                message: "Invalid email",
             });
         }
 
@@ -75,7 +132,8 @@ export const signInUser = async (req: Request, res: Response) => {
         if (userData.password !== password) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid email or password",
+                // message: "Invalid email or password",
+                message: "Invalid password",
             });
         }
 
