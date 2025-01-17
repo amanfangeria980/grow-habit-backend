@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
-import db from "../../utils/firebase";
-import { nanoid } from "nanoid";
+import { Request, Response } from 'express';
+import db from '../../utils/firebase';
+import { nanoid } from 'nanoid';
+import sendEmail from '../../utils/email';
 
 export const registerUser = async (req: Request, res: Response) => {
     const { fullName, email, password, phoneNumber, countryCode } = req.body;
@@ -8,15 +9,12 @@ export const registerUser = async (req: Request, res: Response) => {
 
     try {
         // Check if user already exists
-        const existingUser = await db
-            .collection("users")
-            .where("email", "==", email)
-            .get();
+        const existingUser = await db.collection('users').where('email', '==', email).get();
 
         if (!existingUser.empty) {
             return res.status(400).json({
                 success: false,
-                message: "User with this email already exists",
+                message: 'User with this email already exists',
             });
         }
 
@@ -27,18 +25,22 @@ export const registerUser = async (req: Request, res: Response) => {
             email,
             phoneNumber,
             countryCode,
-            profileImage: "",
+            profileImage: '',
             // hash the password
             password,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
-
-        const result = await db.collection("users").doc(id).set(userDoc);
-        console.log("User registered successfully", result);
+        sendEmail({
+            to: email,
+            subject: 'Welcome to Grow Habit!',
+            text: 'Welcome to Grow Habit!',
+        });
+        const result = await db.collection('users').doc(id).set(userDoc);
+        console.log('User registered successfully', result);
         return res.status(201).json({
             success: true,
-            message: "User registered successfully",
+            message: 'User registered successfully',
             user: {
                 id,
                 fullName,
@@ -48,32 +50,26 @@ export const registerUser = async (req: Request, res: Response) => {
             },
         });
     } catch (error) {
-        console.error("Error registering user:", error);
+        console.error('Error registering user:', error);
         return res.status(500).json({
             success: false,
-            message: "An error occurred while registering user",
-            error: error instanceof Error ? error.message : "Unknown error",
+            message: 'An error occurred while registering user',
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };
 
-export const registerUserByGoogleLogin = async (
-    req: Request,
-    res: Response
-) => {
+export const registerUserByGoogleLogin = async (req: Request, res: Response) => {
     const { fullName, email, id, image } = req.body;
 
     try {
         // Check if user already exists
-        const existingUser = await db
-            .collection("users")
-            .where("email", "==", email)
-            .get();
+        const existingUser = await db.collection('users').where('email', '==', email).get();
 
         if (!existingUser.empty) {
             return res.status(400).json({
                 success: false,
-                message: "User with this email already exists",
+                message: 'User with this email already exists',
             });
         }
 
@@ -88,11 +84,11 @@ export const registerUserByGoogleLogin = async (
             updatedAt: new Date().toISOString(),
         };
 
-        const result = await db.collection("users").doc(id).set(userDoc);
-        console.log("result", result);
+        const result = await db.collection('users').doc(id).set(userDoc);
+        console.log('result', result);
         return res.status(201).json({
             success: true,
-            message: "User registered successfully",
+            message: 'User registered successfully',
             user: {
                 id,
                 fullName,
@@ -100,11 +96,11 @@ export const registerUserByGoogleLogin = async (
             },
         });
     } catch (error) {
-        console.error("Error registering user:", error);
+        console.error('Error registering user:', error);
         return res.status(500).json({
             success: false,
-            message: "An error occurred while registering user",
-            error: error instanceof Error ? error.message : "Unknown error",
+            message: 'An error occurred while registering user',
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };
@@ -113,16 +109,13 @@ export const signInUser = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     try {
         // Check if user exists
-        const userSnapshot = await db
-            .collection("users")
-            .where("email", "==", email)
-            .get();
+        const userSnapshot = await db.collection('users').where('email', '==', email).get();
 
         if (userSnapshot.empty) {
             return res.status(401).json({
                 success: false,
                 // message: "Invalid email or password",
-                message: "Invalid email",
+                message: 'Invalid email',
             });
         }
 
@@ -133,14 +126,14 @@ export const signInUser = async (req: Request, res: Response) => {
             return res.status(401).json({
                 success: false,
                 // message: "Invalid email or password",
-                message: "Invalid password",
+                message: 'Invalid password',
             });
         }
 
         // Return user data without sensitive information
         return res.status(200).json({
             success: true,
-            message: "Sign in successful",
+            message: 'Sign in successful',
             user: {
                 id: userData.id,
                 email: userData.email,
@@ -148,11 +141,11 @@ export const signInUser = async (req: Request, res: Response) => {
             },
         });
     } catch (error) {
-        console.error("Error in sign in:", error);
+        console.error('Error in sign in:', error);
         return res.status(500).json({
             success: false,
-            message: "An error occurred during sign in",
-            error: error instanceof Error ? error.message : "Unknown error",
+            message: 'An error occurred during sign in',
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };

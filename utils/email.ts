@@ -27,8 +27,8 @@ const sendEmail = async ({
 }: {
     to: string[] | string;
     subject: string;
-    text: string | undefined;
-    html: string | undefined;
+    text?: string;
+    html?: string;
 }) => {
     try {
         console.log('Sending email to:', to, 'with subject:', subject, 'and text:', text, 'and html:', html);
