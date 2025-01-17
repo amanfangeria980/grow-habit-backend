@@ -1,26 +1,37 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 // Create transporter configuration
 const transporter = nodemailer.createTransport({
+    service: 'smtp',
     host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
     },
-});
+} as nodemailer.TransportOptions);
 
-/**
- * Sends an email using nodemailer
- * @param {Object} options - Email options
- * @param {string} options.to - Recipient Array of email addresses (required)
- * @param {string} options.subject - Email subject
- * @param {string} options.text - Plain text version of email
- * @param {string} options.html - HTML version of email (optional)
- * @returns {Promise} - Resolves with info about sent email
- */
-const sendEmail = async ({ to, subject, text, html }: { to: string[] | string; subject: string; text: string; html: string }) => {
+// const { sendEmail } = require('../utils/email');
+
+// sendEmail({
+//     to: 'vidyaashram.edu@gmail.com',
+//     subject: 'Test Email',
+//     text: 'This is a test email',
+//     html: '<p>This is a test email</p>',
+// });
+
+const sendEmail = async ({
+    to,
+    subject,
+    text,
+    html,
+}: {
+    to: string[] | string;
+    subject: string;
+    text: string | undefined;
+    html: string | undefined;
+}) => {
     try {
         console.log('Sending email to:', to, 'with subject:', subject, 'and text:', text, 'and html:', html);
         const toArray = Array.isArray(to) ? to.join(', ') : to;
@@ -29,7 +40,7 @@ const sendEmail = async ({ to, subject, text, html }: { to: string[] | string; s
             to: toArray,
             subject,
             text,
-            html: html || text,
+            html: html,
         };
 
         const info = await transporter.sendMail(mailOptions);
@@ -41,15 +52,4 @@ const sendEmail = async ({ to, subject, text, html }: { to: string[] | string; s
     }
 };
 
-module.exports = {
-    sendEmail,
-};
-
-// const { sendEmail } = require('../utils/email');
-
-// sendEmail({
-//     to: 'vidyaashram.edu@gmail.com',
-//     subject: 'Test Email',
-//     text: 'This is a test email',
-//     html: '<p>This is a test email</p>',
-// });
+export default sendEmail;
