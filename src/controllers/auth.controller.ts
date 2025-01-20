@@ -61,27 +61,48 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const registerUserByGoogleLogin = async (req: Request, res: Response) => {
     const { fullName, email, id, image } = req.body;
+    console.log('req.body', req.body);
 
     try {
         // Check if user already exists
         const existingUser = await db.collection('users').where('email', '==', email).get();
 
         if (!existingUser.empty) {
-            return res.status(400).json({
-                success: false,
-                message: 'User with this email already exists',
+            const userData = existingUser.docs[0].data();
+            if (!userData.provider) {
+                await db
+                    .collection('users')
+                    .doc(userData.id)
+                    .update({
+                        provider: 'google',
+                        profileImage: image || userData.profileImage,
+                        updatedAt: new Date().toISOString(),
+                    });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'User updated with Google provider',
+                user: {
+                    id: userData.id,
+                    fullName: userData.fullName,
+                    email: userData.email,
+                },
             });
         }
 
-        // Create new user document
+        // Create new user document if user doesn't exist
         const userDoc = {
             id,
             fullName,
             email,
             profileImage: image,
+            countryCode: null,
+            phoneNumber: null,
             password: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            provider: 'google',
         };
 
         const result = await db.collection('users').doc(id).set(userDoc);
@@ -148,4 +169,64 @@ export const signInUser = async (req: Request, res: Response) => {
             error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
+};
+
+export const updatePhoneNumber = async (req: Request, res: Response) => {
+    const { email, phoneNumber, countryCode } = req.body;
+    console.log('req.body', req.body);
+    const user = await db.collection('users').where('email', '==', email).get();
+    if (user.empty) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const userData = user.docs[0].data();
+    await db.collection('users').doc(userData.id).update({
+        phoneNumber,
+        countryCode,
+        updatedAt: new Date().toISOString(),
+    });
+    return res.status(200).json({ success: true, message: 'Phone number updated successfully' });
+};
+
+export const getPhoneNumber = async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const user = await db.collection('users').where('email', '==', email).get();
+    if (user.empty) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const userData = user.docs[0].data();
+    // if phone number is null, it is also being returned
+    return res.status(200).json({
+        success: true,
+        message: 'Phone number fetched successfully',
+        phoneNumber: userData.phoneNumber,
+        countryCode: userData.countryCode,
+    });
+};
+
+export const checkHasPassword = async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const user = await db.collection('users').where('email', '==', email).get();
+    if (user.empty) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const userData = user.docs[0].data();
+    return res.status(200).json({
+        success: true,
+        message: 'Password fetched successfully',
+        hasPassword: userData.password !== null,
+    });
+};
+
+export const updatePassword = async (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    const user = await db.collection('users').where('email', '==', email).get();
+    if (user.empty) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const userData = user.docs[0].data();
+    await db.collection('users').doc(userData.id).update({
+        password,
+        updatedAt: new Date().toISOString(),
+    });
+    return res.status(200).json({ success: true, message: 'Password updated successfully' });
 };
