@@ -32,6 +32,6 @@ jobs:
           npm i -g pnpm
           pnpm i
 
-      - run: pnpm build --if-present
+      - run: pnpm build
 
       - run: pm2 restart grow-habit-backend
