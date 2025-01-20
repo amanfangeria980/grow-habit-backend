@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import db from "../../utils/firebase";
+import { Request, Response } from 'express';
+import db from '../../utils/firebase';
 
 // Calculate the two pointer status of all the users
 export const getTwoPointerStatus = async (req: Request, res: Response) => {
@@ -10,23 +10,23 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
     // console.log("The value of day is ", day);
     let flag = true;
     let returnData = {
-        dayYesterday: "",
-        dayBeforeYesterday: "",
+        dayYesterday: '',
+        dayBeforeYesterday: '',
     };
 
     if (username && day) {
         try {
             // console.log("I was here");
             const dayYesterdayDoc = await db
-                .collection("reflections")
-                .where("name", "==", username)
-                .where("testDay", "==", day - 1)
+                .collection('reflections')
+                .where('name', '==', username)
+                .where('testDay', '==', day - 1)
                 .get();
 
             if (!dayYesterdayDoc.empty) {
-                let value = "";
+                let value = '';
                 let ctr = 0;
-                dayYesterdayDoc.forEach((doc) => {
+                dayYesterdayDoc.forEach(doc => {
                     const docData = doc.data();
                     // console.log("THe doc data is ", docData.commitment);
                     value = docData.commitment;
@@ -48,15 +48,15 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
             }
 
             const dayBeforeYesterdayDoc = await db
-                .collection("reflections")
-                .where("name", "==", username)
-                .where("testDay", "==", day - 2)
+                .collection('reflections')
+                .where('name', '==', username)
+                .where('testDay', '==', day - 2)
                 .get();
 
             if (!dayBeforeYesterdayDoc.empty) {
-                let value = "";
+                let value = '';
                 let ctr = 0;
-                dayBeforeYesterdayDoc.forEach((doc) => {
+                dayBeforeYesterdayDoc.forEach(doc => {
                     const docData = doc.data();
                     // console.log("THe doc data is ", docData.commitment);
                     value = docData.commitment;
@@ -77,10 +77,7 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
                 flag = false;
             }
         } catch (error) {
-            console.log(
-                "there is an error at backend at (post) /get-two-pointer-status ",
-                error
-            );
+            console.log('there is an error at backend at (post) /get-two-pointer-status ', error);
             flag = false;
         }
     } else {
@@ -89,13 +86,13 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
 
     if (flag === false) {
         res.send({
-            message: "There is something wrong",
+            message: 'There is something wrong',
             results: false,
             data: returnData,
         });
     } else {
         res.send({
-            message: "Everything is right",
+            message: 'Everything is right',
             results: true,
             data: returnData,
         });
@@ -105,14 +102,11 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
 // Get all the reflections from the database
 export const getReflections = async (req: Request, res: Response) => {
     try {
-        const reflectionsSnapshot = await db
-            .collection("reflections")
-            .orderBy("testDay")
-            .get();
+        const reflectionsSnapshot = await db.collection('reflections').orderBy('testDay').get();
 
         let reflectionsData: any = [];
 
-        reflectionsSnapshot.docs.forEach((ref) => {
+        reflectionsSnapshot.docs.forEach(ref => {
             let newValue = {
                 id: ref.id,
                 ...ref.data(),
@@ -120,16 +114,13 @@ export const getReflections = async (req: Request, res: Response) => {
             reflectionsData.push(newValue);
         });
         res.send({
-            message: "Everything is cool",
+            message: 'Everything is cool',
             data: reflectionsData,
         });
     } catch (error) {
-        console.log(
-            "There is an error on backend side in (get) /get-reflections",
-            error
-        );
+        console.log('There is an error on backend side in (get) /get-reflections', error);
         res.send({
-            message: "There is something wrong at (get) /get-reflections",
+            message: 'There is something wrong at (get) /get-reflections',
         });
     }
 };
@@ -138,25 +129,22 @@ export const getReflections = async (req: Request, res: Response) => {
 export const deleteReflection = async (req: Request, res: Response) => {
     const reqData = req.body;
     const data = reqData.data;
-    console.log("This is the value of data from frontend ", data);
+    console.log('This is the value of data from frontend ', data);
 
     try {
-        const targetDoc = await db
-            .collection("reflections")
-            .where("timestamp", "==", data.timestamp)
-            .get();
+        const targetDoc = await db.collection('reflections').where('timestamp', '==', data.timestamp).get();
 
         if (targetDoc.empty) {
             res.json({
-                message: "Please send a valid reflection to be deleted",
+                message: 'Please send a valid reflection to be deleted',
             });
             return;
         }
 
         // Note : logically there should be only one entry for one field but still I am considering that there could be multiple and written the code for it
 
-        targetDoc.forEach(async (doc) => {
-            await db.collection("reflections").doc(doc.id).delete();
+        targetDoc.forEach(async doc => {
+            await db.collection('reflections').doc(doc.id).delete();
         });
 
         res.json({
@@ -164,13 +152,17 @@ export const deleteReflection = async (req: Request, res: Response) => {
         });
         return;
     } catch (error) {
-        console.log(
-            "There is an error at admin/delete-reflection route ",
-            error
-        );
+        console.log('There is an error at admin/delete-reflection route ', error);
         res.json({
             message: `There is an error at admin/delete-reflection route  : ${error}`,
         });
         return;
     }
+};
+
+export const getUserRole = async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const user = await db.collection('users').where('email', '==', email).get();
+    const userData = user.docs[0].data();
+    return res.status(200).json({ success: true, message: 'User role fetched successfully', role: userData.role });
 };

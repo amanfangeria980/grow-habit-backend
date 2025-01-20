@@ -30,6 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
             password,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            role: 'user',
         };
         sendEmail({
             to: email,
@@ -47,6 +48,7 @@ export const registerUser = async (req: Request, res: Response) => {
                 email,
                 phoneNumber,
                 countryCode,
+                role: 'user',
             },
         });
     } catch (error) {
@@ -67,15 +69,11 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
         const existingUser = await db.collection('users').where('email', '==', email).get();
         if (!existingUser.empty) {
             const userData = existingUser.docs[0].data();
-            await db
-                .collection('users')
-                .doc(userData.id)
-                .update({
-                    provider: 'google',
-                    profileImage: image || userData.profileImage,
-                    oauthId: oauthId,
-                    updatedAt: new Date().toISOString(),
-                });
+            await db.collection('users').doc(userData.id).update({
+                // profileImage: image || userData.profileImage,
+                oauthId: oauthId,
+                updatedAt: new Date().toISOString(),
+            });
 
             return res.status(200).json({
                 success: true,
@@ -84,6 +82,7 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
                     id: userData.id,
                     fullName: userData.fullName,
                     email: userData.email,
+                    role: userData.role,
                 },
             });
         }
@@ -101,6 +100,7 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
             password: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            role: 'user',
             provider: 'google',
         };
 
@@ -113,6 +113,7 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
                 id,
                 fullName,
                 email,
+                role: 'user',
             },
         });
     } catch (error) {
@@ -158,6 +159,7 @@ export const signInUser = async (req: Request, res: Response) => {
                 id: userData.id,
                 email: userData.email,
                 fullName: userData.fullName,
+                role: userData.role,
             },
         });
     } catch (error) {
