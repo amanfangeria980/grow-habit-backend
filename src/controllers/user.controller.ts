@@ -71,6 +71,16 @@ export const getGraphData = async (req: Request, res: Response) => {
     }
 };
 
+export const getUserReflections = async (req: Request, res: Response) => {
+    const { username } = req.query;
+
+    console.log('this is the value of username', username);
+
+    return res.json({
+        message: 'This all seems to work',
+    });
+};
+
 export const getIdOfUser = async (req: Request, res: Response) => {
     const { email } = req.body;
     const user = await db.collection('users').where('email', '==', email).get();

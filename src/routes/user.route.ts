@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { createReflection, getGraphData, getIdOfUser } from '../controllers/user.controller';
+import { createReflection, getGraphData, getIdOfUser, getUserReflections } from '../controllers/user.controller';
 
 const userRouter = express.Router();
 
@@ -10,17 +10,7 @@ userRouter.post('/reflect', (req: Request, res: Response) => {
 userRouter.get('/user-graph/:name', (req: Request, res: Response) => {
     getGraphData(req, res);
 });
-userRouter.get('get-user-reflections', (req: Request, res: Response) => {
-    const getUserReflections = async (req: Request, res: Response) => {
-        const { username } = req.query;
-
-        console.log('this is the value of username', username);
-
-        return res.json({
-            message: 'This all seems to work',
-        });
-    };
-
+userRouter.get('/get-user-reflections', (req: Request, res: Response) => {
     getUserReflections(req, res);
 });
 
