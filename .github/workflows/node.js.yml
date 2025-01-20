@@ -34,7 +34,7 @@ jobs:
 
       - run: pnpm build
       - run: |
-            touch .env
-            echo "${{ GROW_HABIT_BACKEND_PROD }}" > .env
+          touch .env
+          echo "${{ secrets.GROW_HABIT_BACKEND_PROD }}" > .env
 
       - run: pm2 restart grow-habit-backend
