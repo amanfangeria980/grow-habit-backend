@@ -30,6 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
             password,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            role: 'user',
         };
         sendEmail({
             to: email,
@@ -47,6 +48,7 @@ export const registerUser = async (req: Request, res: Response) => {
                 email,
                 phoneNumber,
                 countryCode,
+                role: 'user',
             },
         });
     } catch (error) {
@@ -60,25 +62,18 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 export const registerUserByGoogleLogin = async (req: Request, res: Response) => {
-    const { fullName, email, id, image } = req.body;
-    console.log('req.body', req.body);
+    const { fullName, email, oauthId, image } = req.body;
 
     try {
         // Check if user already exists
         const existingUser = await db.collection('users').where('email', '==', email).get();
-
         if (!existingUser.empty) {
             const userData = existingUser.docs[0].data();
-            if (!userData.provider) {
-                await db
-                    .collection('users')
-                    .doc(userData.id)
-                    .update({
-                        provider: 'google',
-                        profileImage: image || userData.profileImage,
-                        updatedAt: new Date().toISOString(),
-                    });
-            }
+            await db.collection('users').doc(userData.id).update({
+                // profileImage: image || userData.profileImage,
+                oauthId: oauthId,
+                updatedAt: new Date().toISOString(),
+            });
 
             return res.status(200).json({
                 success: true,
@@ -87,13 +82,16 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
                     id: userData.id,
                     fullName: userData.fullName,
                     email: userData.email,
+                    role: userData.role,
                 },
             });
         }
 
         // Create new user document if user doesn't exist
+        const id = nanoid();
         const userDoc = {
             id,
+            oauthId,
             fullName,
             email,
             profileImage: image,
@@ -102,6 +100,7 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
             password: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            role: 'user',
             provider: 'google',
         };
 
@@ -114,6 +113,7 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
                 id,
                 fullName,
                 email,
+                role: 'user',
             },
         });
     } catch (error) {
@@ -159,6 +159,7 @@ export const signInUser = async (req: Request, res: Response) => {
                 id: userData.id,
                 email: userData.email,
                 fullName: userData.fullName,
+                role: userData.role,
             },
         });
     } catch (error) {
