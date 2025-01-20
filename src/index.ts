@@ -4,8 +4,6 @@ import cors from 'cors';
 import adminRoutes from './routes/admin.route';
 import whatsappRoutes from './routes/whatsapp.route';
 import { adminTwoPointerStatusAlertMorning } from '../cron-jobs/whatsapp-admin-alerts';
-import { nanoid } from 'nanoid';
-import db from '../utils/firebase';
 import userRouter from './routes/user.route';
 import authRoutes from './routes/auth.route';
 import logger from '../utils/logger';
@@ -45,7 +43,7 @@ app.use(
 app.get('/', (req: Request, res: Response) => {
     console.log('Log: Serve is hit');
 
-    res.send('Welcome to the Grow Habit Backend!!!');
+    res.send('Welcome to the Grow Habit Backend!');
 });
 
 // Admin Routes
