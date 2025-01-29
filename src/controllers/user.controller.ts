@@ -88,3 +88,85 @@ export const getIdOfUser = async (req: Request, res: Response) => {
         id: user.docs[0].id,
     });
 };
+
+export const getTwoPointerStatusToday = async (req: Request, res: Response) => {
+    const { name, day } = req.body;
+    if (day == 1) {
+        return res.json({
+            success: true,
+            data: {
+                dayYesterday: 'undefined',
+                dayBeforeYesterday: 'undefined',
+                status: 'undefined',
+            },
+        });
+    }
+    // const day = 3; // You might want to use new Date().getDate() in production
+    let returnData = {
+        dayYesterday: '',
+        dayBeforeYesterday: '',
+    };
+
+    try {
+        // Get yesterday's data
+        const dayYesterdayDoc = await db
+            .collection('reflections')
+            .where('name', '==', name)
+            .where('testDay', '==', day - 1)
+            .get();
+
+        // Get day before yesterday's data
+        const dayBeforeYesterdayDoc = await db
+            .collection('reflections')
+            .where('name', '==', name)
+            .where('testDay', '==', day - 2)
+            .get();
+
+        // Process yesterday's data
+        if (!dayYesterdayDoc.empty) {
+            dayYesterdayDoc.forEach(doc => {
+                const docData = doc.data();
+                returnData.dayYesterday = docData.commitment || 'no';
+            });
+        } else {
+            returnData.dayYesterday = 'no';
+        }
+
+        // Process day before yesterday's data
+        if (!dayBeforeYesterdayDoc.empty) {
+            dayBeforeYesterdayDoc.forEach(doc => {
+                const docData = doc.data();
+                returnData.dayBeforeYesterday = docData.commitment || 'no';
+            });
+        } else {
+            returnData.dayBeforeYesterday = 'no';
+        }
+
+        // Helper function to check valid status
+        const isValidStatus = (status: string) => ['gateway', 'plus', 'elite'].includes(status);
+
+        // Determine status based on conditions
+        const status =
+            (isValidStatus(returnData.dayYesterday) && isValidStatus(returnData.dayBeforeYesterday)) ||
+            (isValidStatus(returnData.dayYesterday) && returnData.dayBeforeYesterday === 'no')
+                ? 'duck'
+                : returnData.dayYesterday === 'no' && isValidStatus(returnData.dayBeforeYesterday)
+                ? 'crab'
+                : 'cross';
+
+        return res.json({
+            success: true,
+            data: {
+                ...returnData,
+                status,
+            },
+        });
+    } catch (error) {
+        console.error('Error in getTwoPointerStatusToday:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while getting two pointer status',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};

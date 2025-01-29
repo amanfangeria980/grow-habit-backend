@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import { createReflection, getGraphData, getIdOfUser, getUserReflections } from '../controllers/user.controller';
+import { getTwoPointerStatusToday } from '../controllers/user.controller';
 
 const userRouter = express.Router();
 
@@ -16,6 +17,10 @@ userRouter.get('/get-user-reflections', (req: Request, res: Response) => {
 
 userRouter.post('/get-user-id', (req: Request, res: Response) => {
     getIdOfUser(req, res);
+});
+
+userRouter.post('/get-two-pointer-status-today', (req: Request, res: Response) => {
+    getTwoPointerStatusToday(req, res);
 });
 
 export default userRouter;
