@@ -4,13 +4,14 @@ import cors from 'cors';
 import adminRoutes from './routes/admin.route';
 import whatsappRoutes from './routes/whatsapp.route';
 import { adminTwoPointerStatusAlertMorning } from '../cron-jobs/whatsapp-admin-alerts';
+import { reflectionFormAlert } from '../cron-jobs/reflection-form-alerts';
 import userRouter from './routes/user.route';
 import authRoutes from './routes/auth.route';
 import logger from '../utils/logger';
 import morgan from 'morgan';
 
 adminTwoPointerStatusAlertMorning.start();
-
+reflectionFormAlert.start();
 console.log('Cron job for Two Pointer Status Alert Morning has been started.');
 
 dotenv.config();
