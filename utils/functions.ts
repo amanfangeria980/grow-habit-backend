@@ -46,7 +46,7 @@ export const sendMessageText = async (phoneNumbers: number, finStatus: any) => {
         .join('\n');
 
     const response = await axios({
-        url: 'https://graph.facebook.com/v21.0/538151729380352/messages',
+        url: 'https://graph.facebook.com/v21.0/482349938305649/messages',
         method: 'POST',
         headers: {
             Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
