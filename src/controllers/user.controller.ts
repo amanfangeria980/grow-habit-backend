@@ -8,14 +8,15 @@ export const createReflection = async (req: Request, res: Response) => {
     const id = nanoid();
     const { testDay, name } = reqData;
     try {
-        const existingData = await db.collection('reflections').where('testDay', '==', testDay).where('name', '==', name).get();
+        const existingData = await db.collection('userid-reflections').where('testDay', '==', testDay).where('name', '==', name).get();
         if (!existingData.empty) {
             return res.json({
                 success: false,
                 message: `There is already data present at ${testDay} for the user: ${name}`,
             });
         }
-        const docRef = db.collection('reflections').doc(id);
+        console.log("The reflection form is working on this route")
+        const docRef = db.collection('userid-reflections').doc(id);
         await docRef.set(reqData);
         console.log('New entry created with the id:', id);
         return res.json({
@@ -29,6 +30,8 @@ export const createReflection = async (req: Request, res: Response) => {
             error: error.message,
         });
     }
+
+    
 };
 
 export const getGraphData = async (req: Request, res: Response) => {
@@ -170,3 +173,50 @@ export const getTwoPointerStatusToday = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const getMNKUsers = async(req : Request, res : Response)=>{
+
+    try
+    {
+        const userCollection = await db.collection('users').get() ; 
+
+        const mnkUsers : any[] = []
+
+        userCollection.docs.forEach((doc)=>{
+
+            let userData = doc.data() ;
+
+            if("mnk" in userData )
+            {
+                if(userData.mnk === null)
+                mnkUsers.push(doc.data()) ; 
+
+            }
+            
+        })
+
+        return res.status(201).json({
+            message : "This is working whatever it is", 
+            data : mnkUsers
+        })
+
+
+
+
+
+    }
+    catch(error)
+    {
+
+        console.log("there is an error at getMNKUser controller of admin router", error) ;
+        return res.status(500).json({
+            error : "There is an internal servor error"
+        })
+
+    }
+    
+    
+}
+
+
+// Next action : write the getMNKUsers route 
