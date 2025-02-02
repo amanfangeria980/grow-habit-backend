@@ -9,7 +9,7 @@ userRouter.post('/reflect', (req: Request, res: Response) => {
     createReflection(req, res);
 });
 
-userRouter.get('/user-graph/:name', (req: Request, res: Response) => {
+userRouter.get('/user-graph/:userId', (req: Request, res: Response) => {
     getGraphData(req, res);
 });
 userRouter.get('/get-user-reflections', (req: Request, res: Response) => {

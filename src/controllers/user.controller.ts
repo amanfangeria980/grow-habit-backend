@@ -35,10 +35,11 @@ export const createReflection = async (req: Request, res: Response) => {
 };
 
 export const getGraphData = async (req: Request, res: Response) => {
-    const { name } = req.params;
+    const { userId } = req.params;
+   
 
     try {
-        const reflectionsSnapshot = await db.collection('reflections').where('name', '==', name).orderBy('testDay').get();
+        const reflectionsSnapshot = await db.collection('userid-reflections').where('userId', '==', userId).get();
 
         let recordsArray = [];
 
@@ -59,6 +60,8 @@ export const getGraphData = async (req: Request, res: Response) => {
                 };
             }
         });
+
+        // console.log("This is the value of the records array", recordsArray)
 
         res.json({
             success: true,
