@@ -1,7 +1,7 @@
 export const allUsers: string[] = ['parth', 'deepika', 'kavya', 'rashmi', 'govindraju', 'aditya', 'testuser', 'aman'];
 
 export const templateMessageNumbers = [
-    919801801777, 917078609133, 919536536752, 919634033353, 919449870665, 918923520231, 918682059579,
+    919801801777, 917078609133, 919536536752, 919634033353, 919449870665, 918923520231, 918682059579, 918054077051,
 ];
 
 export const normalMessageNumbers = [
@@ -32,5 +32,9 @@ export const normalMessageNumbers = [
     {
         name: 'Deepika',
         number: 918682059579,
+    },
+    {
+        name: 'Madhavi',
+        number: 918054077051,
     },
 ];
