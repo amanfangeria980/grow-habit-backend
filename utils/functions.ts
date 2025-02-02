@@ -83,8 +83,21 @@ export const sendMessageTemplate = async (phoneNumbers: number | number[]) => {
                         to: number,
                         type: 'template',
                         template: {
-                            name: 'hello_world',
+                            name: 'welcome_message',
                             language: { code: 'en_US' },
+                            components: [
+                                {
+                                    type: 'header',
+                                    parameters: [
+                                        {
+                                            type: 'image',
+                                            image: {
+                                                id: '1796380164496898',
+                                            },
+                                        },
+                                    ],
+                                },
+                            ],
                         },
                     }),
                 });
