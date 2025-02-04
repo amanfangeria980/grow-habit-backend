@@ -61,7 +61,6 @@ export const getGraphData = async (req: Request, res: Response) => {
             }
         });
 
-        // console.log("This is the value of the records array", recordsArray)
 
         res.json({
             success: true,
@@ -219,6 +218,51 @@ export const getMNKUsers = async(req : Request, res : Response)=>{
     }
     
     
+}
+
+export const getAllUsers = async(req : Request, res : Response)=>{
+
+    try
+    {
+        const userCollection = await db.collection('users').get() ; 
+
+        const mnkUsers : any[] = []
+
+        userCollection.docs.forEach((doc)=>{
+
+            let userData = doc.data() ;
+
+            if(userData.exists)
+            {
+                mnkUsers.push(doc.data())
+            }
+
+           
+            
+        })
+
+        return res.status(201).json({
+            message : "This is working whatever it is", 
+            data : mnkUsers
+        })
+
+
+
+
+
+    }
+    catch(error)
+    {
+
+        console.log("there is an error at getMNKUser controller of admin router", error) ;
+        return res.status(500).json({
+            error : "There is an internal servor error"
+        })
+
+    }
+    
+
+
 }
 
 
