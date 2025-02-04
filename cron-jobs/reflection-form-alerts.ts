@@ -25,7 +25,7 @@ export const reflectionFormAlert = cron.schedule(
                             to: user.number,
                             type: 'text',
                             text: {
-                                body: `Hey ${user.name}! \n\n*Please fill the reflection for today*👇🏻\n\nhttps://growhabit.me/reflection-form`,
+                                body: `Hey ${user.name}! 🚀\n\nTime to reflect and conquer the day!\n*Fill out your form below👇🏻📝*\n\nhttps://growhabit.me/reflection-form`,
                             },
                         }),
                     });
