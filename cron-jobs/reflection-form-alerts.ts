@@ -1,10 +1,11 @@
 import cron from 'node-cron';
 import { normalMessageNumbers } from '../constants';
 import axios from 'axios';
+import { motivationalQuotes } from '../constants';
 
 export const reflectionFormAlert = cron.schedule(
     '0 19,22 * * *',
-    // '* * * * *',
+    // '* * * * * *',
     async () => {
         const phoneNumbers = normalMessageNumbers;
         const numbers = Array.isArray(phoneNumbers) ? phoneNumbers : [phoneNumbers];
@@ -13,6 +14,9 @@ export const reflectionFormAlert = cron.schedule(
         try {
             for (const user of numbers) {
                 try {
+                    const dayIndex = new Date().getDate() - 1; // 0-based index
+                    const todaysQuote = motivationalQuotes[dayIndex % motivationalQuotes.length];
+
                     const response = await axios({
                         url: 'https://graph.facebook.com/v21.0/482349938305649/messages',
                         method: 'POST',
@@ -25,7 +29,7 @@ export const reflectionFormAlert = cron.schedule(
                             to: user.number,
                             type: 'text',
                             text: {
-                                body: `Hey ${user.name}! 🚀\n\nTime to reflect and conquer the day!\n*Fill out your form below👇🏻📝*\n\nhttps://growhabit.me/reflection-form`,
+                                body: `Hey ${user.name}! 🚀\n\nTime to reflect and conquer the day! 😁\n\n**1.01³⁶⁵ = 37x better** 🔥\n\n${todaysQuote}\n\n*Fill out your form below👇🏻📝*\n\nhttps://growhabit.me/reflection-form`,
                             },
                         }),
                     });
