@@ -1,4 +1,4 @@
-import { allUsers } from "../constants";
+import { allUsers } from '../constants';
 
 const calculateTwoPointerStatusAdmin = async (day: number) => {
     const finStatus: { username: string; status: string }[] = [];
@@ -6,35 +6,34 @@ const calculateTwoPointerStatusAdmin = async (day: number) => {
     const fetchStatusForUser = async (username: string) => {
         const sendData = { username, day };
         try {
-            const response = await fetch(
-                `${process.env.BACKEND_URL}/admin/get-two-pointer-status`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(sendData),
-                }
-            );
+            const response = await fetch(`${process.env.BACKEND_URL}/admin/get-two-pointer-status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sendData),
+            });
             const repData: any = await response.json();
             let { dayYesterday, dayBeforeYesterday } = repData.data;
 
             // Convert empty strings to "no"
-            dayYesterday = dayYesterday === "" ? "no" : dayYesterday;
-            dayBeforeYesterday =
-                dayBeforeYesterday === "" ? "no" : dayBeforeYesterday;
+            dayYesterday = dayYesterday === '' ? 'no' : dayYesterday;
+            dayBeforeYesterday = dayBeforeYesterday === '' ? 'no' : dayBeforeYesterday;
 
             // Helper function to check valid status
-            const isValidStatus = (status: string) =>
-                ["gateway", "plus", "elite"].includes(status);
+            const isValidStatus = (status: string) => ['gateway', 'plus', 'elite'].includes(status);
 
             // Determine status based on conditions
-            const status =
-                (isValidStatus(dayYesterday) &&
-                    isValidStatus(dayBeforeYesterday)) ||
-                (isValidStatus(dayYesterday) && dayBeforeYesterday === "no")
-                    ? "duck"
-                    : dayYesterday === "no" && isValidStatus(dayBeforeYesterday)
-                    ? "crab"
-                    : "cross";
+            const status = (() => {
+                if (
+                    (isValidStatus(dayYesterday) && isValidStatus(dayBeforeYesterday)) ||
+                    (isValidStatus(dayYesterday) && dayBeforeYesterday === 'no')
+                ) {
+                    // Differentiate between gateway, plus, and elite for duck status
+                    if (dayYesterday === 'plus') return 'duck P';
+                    if (dayYesterday === 'elite') return 'duck E';
+                    return 'duck';
+                }
+                return dayYesterday === 'no' && isValidStatus(dayBeforeYesterday) ? 'crab' : 'cross';
+            })();
 
             return { username, status };
         } catch (error) {
@@ -48,11 +47,8 @@ const calculateTwoPointerStatusAdmin = async (day: number) => {
 
     // Filter out null results and add valid statuses
     userStatuses
-        .filter(
-            (status): status is { username: string; status: string } =>
-                status !== null
-        )
-        .forEach((status) => finStatus.push(status));
+        .filter((status): status is { username: string; status: string } => status !== null)
+        .forEach(status => finStatus.push(status));
 
     return finStatus;
 };

@@ -9,9 +9,12 @@ import userRouter from './routes/user.route';
 import authRoutes from './routes/auth.route';
 import logger from '../utils/logger';
 import morgan from 'morgan';
+import { goodNightMessage } from '../cron-jobs/good-night-message';
 
 adminTwoPointerStatusAlertMorning.start();
 reflectionFormAlert.start();
+goodNightMessage.start();
+
 console.log('Cron job for Two Pointer Status Alert Morning has been started.');
 
 dotenv.config();
