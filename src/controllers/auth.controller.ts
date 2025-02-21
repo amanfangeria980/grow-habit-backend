@@ -32,7 +32,7 @@ export const registerUser = async (req: Request, res: Response) => {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             role: 'user',
-            mnk 
+            mnk : null 
         };
         sendEmail({
             to: email,
@@ -104,7 +104,7 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
             updatedAt: new Date().toISOString(),
             role: 'user',
             provider: 'google',
-            mnk : null
+            mnk : null 
         };
 
         const result = await db.collection('users').doc(id).set(userDoc);

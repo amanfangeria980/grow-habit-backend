@@ -212,6 +212,73 @@ export const createMNK = async (req: Request, res: Response) => {
     }
 };
 
+export const deleteMNK = async(req : Request, res : Response) => {
+
+    const {mnkId} = req.body ; 
+
+    if(!mnkId)
+    {
+        return res.status(400).json({
+            message : "There is no mnk value"
+        })
+
+    }
+
+    try{
+
+    
+    const mnkRef = db.collection('mnk').doc(mnkId) ; 
+
+    const mnkDocRef = await mnkRef.get() ; 
+
+    if(!mnkDocRef.exists)
+    {
+
+        return res.status(404).json({
+            message : "There is not mnk document present for the corresponding mnkID"
+        })
+
+    }
+
+    const mnkData = await mnkDocRef.data() ; 
+
+    const usersArray = mnkData?.users || [] ; 
+
+    const updatePromises = usersArray.map(async(user : any)=>{
+        const userRef = db.collection('users').doc(user.userId) ;
+        return userRef.update({mnk : null})
+    })
+
+    await Promise.all(updatePromises) ; 
+
+    await mnkRef.delete() ; 
+
+    return res.status(200).json({
+        message : "The MNK users have been deleted"
+    })
+
+    
+
+}
+catch(error)
+{
+
+    console.log("there is an error at deleteMNK at admin.controller.ts", error) ; 
+    return res.status(500).json(
+        {
+            message : "There is an internal server error ", 
+            error : error
+        }
+    )
+
+}
+
+
+    
+
+
+}
+
 export const getMNKGroups = async (req: Request, res: Response) => {
     try {
         const mnkCollection = db.collection('mnk');
@@ -296,3 +363,66 @@ export const addToMNK = async (req: Request, res: Response) => {
 
     // add mnkId to userId
 };
+
+export const removeFromMNK = async(req : Request, res : Response)=>{
+
+    const {userId, mnkId} = req.body ; 
+
+    if(!userId || !mnkId)
+    {
+        return res.status(400).json({
+            message : "The userId or mnkId is not present"
+        })
+    }
+
+    const userDocRef = db.collection('users').doc(userId) ; 
+
+    try{
+
+
+    
+    await userDocRef.update({
+        mnk : null 
+    })
+
+    const mnkRef = db.collection('mnk').doc(mnkId)  ; 
+    const mnkDocRef = await mnkRef.get() ; 
+
+    if(!mnkDocRef.exists)
+    {
+        return res.status(404).json({
+            message : "The mnk document not found"
+        })
+    }
+
+    const mnkData = await mnkDocRef.data() ; 
+    const usersArray = mnkData?.users || [] ; 
+
+    const updateUsersArray = usersArray.filter((user : any)=>(user.userId !== userId))
+
+    await mnkRef.update({
+        users : updateUsersArray
+    })
+
+    return res.status(200).json({
+        message : "The user is removed from MNK"
+    })
+
+
+}
+catch(error : any)
+{
+
+    console.log("there is an error at removeFromMnk in admin.controller.js", error) ; 
+
+    return res.status(500).json({
+        message : "There is an internal server error" , 
+        error : error.message 
+
+    })
+
+}
+
+}
+
+

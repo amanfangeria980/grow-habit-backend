@@ -2,6 +2,55 @@ import { nanoid } from 'nanoid';
 import db from '../../utils/firebase';
 import { Request, Response } from 'express';
 
+
+// get user details using the userId 
+
+export const getUserDetails = async(req : Request, res : Response) =>{
+
+    try{
+
+ 
+
+    const {userId} = req.body ; 
+
+    if(!userId)
+    {
+        return res.status(400).json({
+            message : "Please provide a userId"
+        })
+    }
+
+    const userDoc = await db.collection('users').doc(userId).get() ; 
+
+    if(!userDoc.exists)
+    {
+        return res.status(404).json({
+            message : "There is no user found for the particular userId"
+        })
+    }
+
+    const userData = {...userDoc.data()} ; 
+
+    return res.status(200).json({
+        message : "The user data is fetched successfully", 
+        data : userData 
+    })
+
+}
+catch(error : any)
+{
+
+    console.log("There is an error at getUserDetails at user.controller.ts", error) ; 
+
+    return res.status(500).json({
+        message : "There is some error in getUser details controller of user.controller.ts", 
+        error : error.message 
+    })
+
+}
+
+
+}
 // Create and store reflections in the database
 export const createReflection = async (req: Request, res: Response) => {
     const reqData = req.body;
@@ -220,26 +269,42 @@ export const getMNKUsers = async(req : Request, res : Response)=>{
     
 }
 
+interface UserDetail  {
+
+    userId : string ; 
+    userName : string ; 
+    
+     
+}
+
 export const getAllUsers = async(req : Request, res : Response)=>{
 
     try
     {
         const userCollection = await db.collection('users').get() ; 
 
-        const mnkUsers : any[] = []
+        let mnkUsers : UserDetail[] = []
 
-        userCollection.docs.forEach((doc)=>{
+        let count = 0 ; 
 
-            let userData = doc.data() ;
+        userCollection.docs.forEach((doc : any)=>{
 
-            if(userData.exists)
-            {
-                mnkUsers.push(doc.data())
-            }
+            
+
+            
+
+            
+            console.log("This is the value of doc.data() ", doc.data())
+            let {fullName, id } = doc.data() ;
+            mnkUsers.push({ userName : fullName || "", userId : id || ""})
+            
 
            
             
         })
+
+        console.log("This is the value of mnkUSers ", mnkUsers) ; 
+        console.log("The value of the count is ", count) ;
 
         return res.status(201).json({
             message : "This is working whatever it is", 
