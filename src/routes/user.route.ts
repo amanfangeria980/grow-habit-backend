@@ -4,6 +4,7 @@ import { getTwoPointerStatusToday } from '../controllers/user.controller';
 import { getUserDetails } from '../controllers/user.controller';
 import { addToMNK } from '../controllers/admin.controller';
 import { getAllMNKGroups } from '../controllers/user.mnk.controller';
+import { createHabit } from '../controllers/user.habit.controller';
 
 const userRouter = express.Router();
 
@@ -55,4 +56,10 @@ userRouter.get('/get-all-mnk', (req : Request, res : Response)=>{
     getAllMNKGroups(req, res) ; 
 })
 
+
+// ************************************** All the below are user.habit.controller routes *****************************************
+
+userRouter.post('/create-habit', (req : Request, res : Response)=>{
+    createHabit(req, res) ; 
+})
 export default userRouter;
