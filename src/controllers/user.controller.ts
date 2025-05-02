@@ -6,8 +6,7 @@ import { Request, Response } from 'express';
 
 export const getUserDetails = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.body;
-
+        const { userId } = req.params;
         if (!userId) {
             return res.status(400).json({
                 message: 'Please provide a userId',
@@ -271,4 +270,51 @@ interface UserDetail {
 //     }
 // };
 
-// Next action : write the getMNKUsers route
+export const sendMNKJoinRequest = async (req: Request, res: Response) => {
+    try {
+        const { groupId, userId, name, groupName } = req.body;
+
+        if (!groupId || !userId || !name || !groupName) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: groupId, userId, name, or groupName',
+            });
+        }
+
+        // Check if request already exists
+        const existingRequest = await db.collection('mnk-requests').where('userId', '==', userId).get();
+
+        if (!existingRequest.empty) {
+            return res.status(400).json({
+                success: false,
+                message: 'A request from this user for this group already exists',
+            });
+        }
+
+        // Create new request
+        const requestData = {
+            groupId,
+            userId,
+            name,
+            groupName,
+            status: 'pending', // pending, accepted, rejected
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+
+        await db.collection('mnk-requests').add(requestData);
+
+        return res.status(201).json({
+            success: true,
+            message: 'MNK join request sent successfully',
+            data: requestData,
+        });
+    } catch (error) {
+        console.error('Error in sendMNKJoinRequest:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while sending the join request',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};

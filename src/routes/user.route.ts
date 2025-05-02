@@ -6,6 +6,7 @@ import {
     getIdOfUser,
     getMNKUsers,
     getUserReflections,
+    sendMNKJoinRequest,
 } from '../controllers/user.controller';
 import { getTwoPointerStatusToday } from '../controllers/user.controller';
 import { getUserDetails } from '../controllers/user.controller';
@@ -18,7 +19,7 @@ const userRouter = express.Router();
 // ****************************** All the below are user routes *****************************************************
 
 // this route needs to be written and it's controller needs to be created
-userRouter.post('/get-user-details', (req: Request, res: Response) => {
+userRouter.get('/get-user-details/:userId', (req: Request, res: Response) => {
     getUserDetails(req, res);
 });
 
@@ -63,5 +64,9 @@ userRouter.get('/get-all-mnk', (req: Request, res: Response) => {
 
 userRouter.post('/create-habit', (req: Request, res: Response) => {
     createHabit(req, res);
+});
+
+userRouter.post('/send-mnk-join-request', (req: Request, res: Response) => {
+    sendMNKJoinRequest(req, res);
 });
 export default userRouter;

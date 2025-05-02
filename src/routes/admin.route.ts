@@ -79,7 +79,7 @@ adminRouter.post('/create-mnk', (req, res) => {
     createMNK(req, res);
 });
 
-adminRouter.get('/get-mnk', (req, res) => {
+adminRouter.get('/get-mnk-groups', (req, res) => {
     getMNKGroups(req, res);
 });
 
