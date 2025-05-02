@@ -1,6 +1,15 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import { getTwoPointerStatus, getReflections, deleteReflection, getUserRole, createMNK, getMNKGroups, removeFromMNK, deleteMNK } from '../controllers/admin.controller';
+import {
+    getTwoPointerStatus,
+    getReflections,
+    deleteReflection,
+    getUserRole,
+    createMNK,
+    getMNKGroups,
+    removeFromMNK,
+    deleteMNK,
+} from '../controllers/admin.controller';
 import db from '../../utils/firebase';
 
 const adminRouter = express.Router();
@@ -66,20 +75,20 @@ adminRouter.post('/get-user-role', (req, res) => {
     getUserRole(req, res);
 });
 
-adminRouter.post('/create-mnk', (req, res)=>{
-    createMNK(req, res) ; 
-})
+adminRouter.post('/create-mnk', (req, res) => {
+    createMNK(req, res);
+});
 
-adminRouter.get('/get-mnk', (req, res)=>{
-    getMNKGroups(req, res) 
-})
+adminRouter.get('/get-mnk', (req, res) => {
+    getMNKGroups(req, res);
+});
 
-adminRouter.post('/remove-from-mnk', (req,res)=>{
-    removeFromMNK(req, res) 
-})
+adminRouter.post('/remove-from-mnk', (req, res) => {
+    removeFromMNK(req, res);
+});
 
-adminRouter.post('/delete-mnk-group', (req, res)=>{
-    deleteMNK(req,res)
-})
+adminRouter.post('/delete-mnk-group', (req, res) => {
+    deleteMNK(req, res);
+});
 
 export default adminRouter;

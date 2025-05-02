@@ -1,5 +1,12 @@
 import express, { Request, Response } from 'express';
-import { createReflection, getAllUsers, getGraphData, getIdOfUser, getMNKUsers, getUserReflections } from '../controllers/user.controller';
+import {
+    createReflection,
+    // getAllUsers,
+    getGraphData,
+    getIdOfUser,
+    getMNKUsers,
+    getUserReflections,
+} from '../controllers/user.controller';
 import { getTwoPointerStatusToday } from '../controllers/user.controller';
 import { getUserDetails } from '../controllers/user.controller';
 import { addToMNK } from '../controllers/admin.controller';
@@ -10,12 +17,10 @@ const userRouter = express.Router();
 
 // ****************************** All the below are user routes *****************************************************
 
-// this route needs to be written and it's controller needs to be created 
-userRouter.post('/get-user-details', (req : Request, res : Response)=>{
-
-    getUserDetails(req,res) ; 
-    
-})
+// this route needs to be written and it's controller needs to be created
+userRouter.post('/get-user-details', (req: Request, res: Response) => {
+    getUserDetails(req, res);
+});
 
 userRouter.post('/reflect', (req: Request, res: Response) => {
     createReflection(req, res);
@@ -36,30 +41,27 @@ userRouter.post('/get-two-pointer-status-today', (req: Request, res: Response) =
     getTwoPointerStatusToday(req, res);
 });
 
-userRouter.get('/get-mnk-users', (req : Request, res : Response)=>{
-    getMNKUsers(req, res) ; 
-})
+userRouter.get('/get-mnk-users', (req: Request, res: Response) => {
+    getMNKUsers(req, res);
+});
 
-userRouter.post('/add-user-mnk', (req : Request, res : Response)=>{
-    addToMNK(req, res) ; 
-})
+userRouter.post('/add-user-mnk', (req: Request, res: Response) => {
+    addToMNK(req, res);
+});
 
-userRouter.get('/get-all-users', (req : Request, res : Response)=>{
-    getAllUsers(req, res) ; 
-})
-
+// userRouter.get('/get-all-users', (req: Request, res: Response) => {
+//     getAllUsers(req, res);
+// });
 
 // ************************************* All the below are User.mnk routes ****************************************************
 
-
-userRouter.get('/get-all-mnk', (req : Request, res : Response)=>{
-    getAllMNKGroups(req, res) ; 
-})
-
+userRouter.get('/get-all-mnk', (req: Request, res: Response) => {
+    getAllMNKGroups(req, res);
+});
 
 // ************************************** All the below are user.habit.controller routes *****************************************
 
-userRouter.post('/create-habit', (req : Request, res : Response)=>{
-    createHabit(req, res) ; 
-})
+userRouter.post('/create-habit', (req: Request, res: Response) => {
+    createHabit(req, res);
+});
 export default userRouter;

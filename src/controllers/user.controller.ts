@@ -2,69 +2,59 @@ import { nanoid } from 'nanoid';
 import db from '../../utils/firebase';
 import { Request, Response } from 'express';
 
+// get user details using the userId
 
-// get user details using the userId 
+export const getUserDetails = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.body;
 
-export const getUserDetails = async(req : Request, res : Response) =>{
+        if (!userId) {
+            return res.status(400).json({
+                message: 'Please provide a userId',
+            });
+        }
 
-    try{
+        const userDoc = await db.collection('users').doc(userId).get();
 
- 
+        if (!userDoc.exists) {
+            return res.status(404).json({
+                message: 'There is no user found for the particular userId',
+            });
+        }
 
-    const {userId} = req.body ; 
+        const userData = { ...userDoc.data() };
 
-    if(!userId)
-    {
-        return res.status(400).json({
-            message : "Please provide a userId"
-        })
+        return res.status(200).json({
+            message: 'The user data is fetched successfully',
+            data: userData,
+        });
+    } catch (error: any) {
+        console.log('There is an error at getUserDetails at user.controller.ts', error);
+
+        return res.status(500).json({
+            message: 'There is some error in getUser details controller of user.controller.ts',
+            error: error.message,
+        });
     }
-
-    const userDoc = await db.collection('users').doc(userId).get() ; 
-
-    if(!userDoc.exists)
-    {
-        return res.status(404).json({
-            message : "There is no user found for the particular userId"
-        })
-    }
-
-    const userData = {...userDoc.data()} ; 
-
-    return res.status(200).json({
-        message : "The user data is fetched successfully", 
-        data : userData 
-    })
-
-}
-catch(error : any)
-{
-
-    console.log("There is an error at getUserDetails at user.controller.ts", error) ; 
-
-    return res.status(500).json({
-        message : "There is some error in getUser details controller of user.controller.ts", 
-        error : error.message 
-    })
-
-}
-
-
-}
+};
 // Create and store reflections in the database
 export const createReflection = async (req: Request, res: Response) => {
     const reqData = req.body;
     const id = nanoid();
     const { testDay, name } = reqData;
     try {
-        const existingData = await db.collection('userid-reflections').where('testDay', '==', testDay).where('name', '==', name).get();
+        const existingData = await db
+            .collection('userid-reflections')
+            .where('testDay', '==', testDay)
+            .where('name', '==', name)
+            .get();
         if (!existingData.empty) {
             return res.json({
                 success: false,
                 message: `There is already data present at ${testDay} for the user: ${name}`,
             });
         }
-        console.log("The reflection form is working on this route")
+        console.log('The reflection form is working on this route');
         const docRef = db.collection('userid-reflections').doc(id);
         await docRef.set(reqData);
         console.log('New entry created with the id:', id);
@@ -79,13 +69,10 @@ export const createReflection = async (req: Request, res: Response) => {
             error: error.message,
         });
     }
-
-    
 };
 
 export const getGraphData = async (req: Request, res: Response) => {
     const { userId } = req.params;
-   
 
     try {
         const reflectionsSnapshot = await db.collection('userid-reflections').where('userId', '==', userId).get();
@@ -109,7 +96,6 @@ export const getGraphData = async (req: Request, res: Response) => {
                 };
             }
         });
-
 
         res.json({
             success: true,
@@ -225,110 +211,64 @@ export const getTwoPointerStatusToday = async (req: Request, res: Response) => {
     }
 };
 
-export const getMNKUsers = async(req : Request, res : Response)=>{
+export const getMNKUsers = async (req: Request, res: Response) => {
+    try {
+        const userCollection = await db.collection('users').get();
 
-    try
-    {
-        const userCollection = await db.collection('users').get() ; 
+        const mnkUsers: any[] = [];
 
-        const mnkUsers : any[] = []
+        userCollection.docs.forEach(doc => {
+            let userData = doc.data();
 
-        userCollection.docs.forEach((doc)=>{
-
-            let userData = doc.data() ;
-
-            if("mnk" in userData )
-            {
-                if(userData.mnk === null)
-                mnkUsers.push(doc.data()) ; 
-
+            if ('mnk' in userData) {
+                if (userData.mnk === null) mnkUsers.push(doc.data());
             }
-            
-        })
+        });
 
         return res.status(201).json({
-            message : "This is working whatever it is", 
-            data : mnkUsers
-        })
-
-
-
-
-
-    }
-    catch(error)
-    {
-
-        console.log("there is an error at getMNKUser controller of admin router", error) ;
+            message: 'This is working whatever it is',
+            data: mnkUsers,
+        });
+    } catch (error) {
+        console.log('there is an error at getMNKUser controller of admin router', error);
         return res.status(500).json({
-            error : "There is an internal servor error"
-        })
-
+            error: 'There is an internal servor error',
+        });
     }
-    
-    
+};
+
+interface UserDetail {
+    userId: string;
+    userName: string;
 }
 
-interface UserDetail  {
+// export const getAllUsers = async (req: Request, res: Response) => {
+//     try {
+//         const userCollection = await db.collection('users').get();
 
-    userId : string ; 
-    userName : string ; 
-    
-     
-}
+//         let mnkUsers: UserDetail[] = [];
 
-export const getAllUsers = async(req : Request, res : Response)=>{
+//         let count = 0;
 
-    try
-    {
-        const userCollection = await db.collection('users').get() ; 
+//         userCollection.docs.forEach((doc: any) => {
+//             console.log('This is the value of doc.data() ', doc.data());
+//             let { fullName, id } = doc.data();
+//             mnkUsers.push({ userName: fullName || '', userId: id || '' });
+//         });
 
-        let mnkUsers : UserDetail[] = []
+//         console.log('This is the value of mnkUSers ', mnkUsers);
+//         console.log('The value of the count is ', count);
 
-        let count = 0 ; 
+//         return res.status(201).json({
+//             message: 'This is working whatever it is',
+//             data: mnkUsers,
+//         });
+//     } catch (error) {
+//         console.log('there is an error at getMNKUser controller of admin router', error);
+//         return res.status(500).json({
+//             error: 'There is an internal servor error',
+//         });
+//     }
+// };
 
-        userCollection.docs.forEach((doc : any)=>{
-
-            
-
-            
-
-            
-            console.log("This is the value of doc.data() ", doc.data())
-            let {fullName, id } = doc.data() ;
-            mnkUsers.push({ userName : fullName || "", userId : id || ""})
-            
-
-           
-            
-        })
-
-        console.log("This is the value of mnkUSers ", mnkUsers) ; 
-        console.log("The value of the count is ", count) ;
-
-        return res.status(201).json({
-            message : "This is working whatever it is", 
-            data : mnkUsers
-        })
-
-
-
-
-
-    }
-    catch(error)
-    {
-
-        console.log("there is an error at getMNKUser controller of admin router", error) ;
-        return res.status(500).json({
-            error : "There is an internal servor error"
-        })
-
-    }
-    
-
-
-}
-
-
-// Next action : write the getMNKUsers route 
+// Next action : write the getMNKUsers route

@@ -5,7 +5,7 @@ import sendEmail from '../../utils/email';
 
 export const registerUser = async (req: Request, res: Response) => {
     const { fullName, email, password, phoneNumber, countryCode, mnk } = req.body;
-    console.log("The value of mnk is", mnk)
+    console.log('The value of mnk is', mnk);
     const id = nanoid();
 
     try {
@@ -32,9 +32,9 @@ export const registerUser = async (req: Request, res: Response) => {
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             role: 'user',
-            mnk : null, 
-            primaryHabit : null, 
-            secondaryHabit : [], 
+            mnk: null,
+            primaryHabit: null,
+            secondaryHabit: [],
         };
         sendEmail({
             to: email,
@@ -106,10 +106,10 @@ export const registerUserByGoogleLogin = async (req: Request, res: Response) => 
             updatedAt: new Date().toISOString(),
             role: 'user',
             provider: 'google',
-            mnk : null , 
-            primaryHabit : null, 
-            secondaryHabit : [], 
-            archivedHabits : []
+            mnk: null,
+            primaryHabit: null,
+            secondaryHabit: [],
+            archivedHabits: [],
         };
 
         const result = await db.collection('users').doc(id).set(userDoc);
