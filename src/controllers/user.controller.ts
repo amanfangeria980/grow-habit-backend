@@ -212,26 +212,38 @@ export const getTwoPointerStatusToday = async (req: Request, res: Response) => {
 
 export const getMNKUsers = async (req: Request, res: Response) => {
     try {
-        const userCollection = await db.collection('users').get();
+        const { mnkId } = req.params;
 
-        const mnkUsers: any[] = [];
+        if (!mnkId) {
+            return res.status(400).json({
+                success: false,
+                message: 'MNK ID is required',
+            });
+        }
 
-        userCollection.docs.forEach(doc => {
-            let userData = doc.data();
+        const mnkDoc = await db.collection('mnk').doc(mnkId).get();
 
-            if ('mnk' in userData) {
-                if (userData.mnk === null) mnkUsers.push(doc.data());
-            }
-        });
+        if (!mnkDoc.exists) {
+            return res.status(404).json({
+                success: false,
+                message: 'MNK group not found',
+            });
+        }
 
-        return res.status(201).json({
-            message: 'This is working whatever it is',
-            data: mnkUsers,
+        const mnkData = mnkDoc.data();
+        const users = mnkData?.users || [];
+
+        return res.status(200).json({
+            success: true,
+            message: 'MNK users fetched successfully',
+            data: users,
         });
     } catch (error) {
-        console.log('there is an error at getMNKUser controller of admin router', error);
+        console.log('there is an error at getMNKUser controller', error);
         return res.status(500).json({
-            error: 'There is an internal servor error',
+            success: false,
+            message: 'Internal server error',
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };
