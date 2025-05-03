@@ -1,6 +1,19 @@
 import express from 'express';
 import { Request, Response } from 'express';
-import { getTwoPointerStatus, getReflections, deleteReflection, getUserRole } from '../controllers/admin.controller';
+import {
+    getTwoPointerStatus,
+    getReflections,
+    deleteReflection,
+    getUserRole,
+    createMNK,
+    getMNKGroups,
+    removeFromMNK,
+    deleteMNK,
+    usersEligibleForMNK,
+    addToMNK,
+    getMNKJoinRequests,
+    handleJoinRequest,
+} from '../controllers/admin.controller';
 import db from '../../utils/firebase';
 
 const adminRouter = express.Router();
@@ -64,6 +77,39 @@ adminRouter.post('/update-reflection', (req, res) => {
 
 adminRouter.post('/get-user-role', (req, res) => {
     getUserRole(req, res);
+});
+
+adminRouter.post('/create-mnk', (req, res) => {
+    createMNK(req, res);
+});
+
+adminRouter.get('/get-mnk-groups', (req, res) => {
+    getMNKGroups(req, res);
+});
+
+adminRouter.post('/remove-from-mnk', (req, res) => {
+    removeFromMNK(req, res);
+});
+
+adminRouter.post('/delete-mnk-group', (req, res) => {
+    deleteMNK(req, res);
+});
+
+adminRouter.post('/add-to-mnk', (req, res) => {
+    addToMNK(req, res);
+});
+
+adminRouter.get('/users-eligible-for-mnk', (req, res) => {
+    usersEligibleForMNK(req, res);
+});
+
+// MNK Join Request Routes
+adminRouter.get('/mnk-join-requests/:mnkId', (req: Request, res: Response) => {
+    getMNKJoinRequests(req, res);
+});
+
+adminRouter.post('/mnk-join-request/handle', (req: Request, res: Response) => {
+    handleJoinRequest(req, res);
 });
 
 export default adminRouter;

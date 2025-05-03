@@ -2,20 +2,59 @@ import { nanoid } from 'nanoid';
 import db from '../../utils/firebase';
 import { Request, Response } from 'express';
 
+// get user details using the userId
+
+export const getUserDetails = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+        if (!userId) {
+            return res.status(400).json({
+                message: 'Please provide a userId',
+            });
+        }
+
+        const userDoc = await db.collection('users').doc(userId).get();
+
+        if (!userDoc.exists) {
+            return res.status(404).json({
+                message: 'There is no user found for the particular userId',
+            });
+        }
+
+        const userData = { ...userDoc.data() };
+
+        return res.status(200).json({
+            message: 'The user data is fetched successfully',
+            data: userData,
+        });
+    } catch (error: any) {
+        console.log('There is an error at getUserDetails at user.controller.ts', error);
+
+        return res.status(500).json({
+            message: 'There is some error in getUser details controller of user.controller.ts',
+            error: error.message,
+        });
+    }
+};
 // Create and store reflections in the database
 export const createReflection = async (req: Request, res: Response) => {
     const reqData = req.body;
     const id = nanoid();
     const { testDay, name } = reqData;
     try {
-        const existingData = await db.collection('reflections').where('testDay', '==', testDay).where('name', '==', name).get();
+        const existingData = await db
+            .collection('userid-reflections')
+            .where('testDay', '==', testDay)
+            .where('name', '==', name)
+            .get();
         if (!existingData.empty) {
             return res.json({
                 success: false,
                 message: `There is already data present at ${testDay} for the user: ${name}`,
             });
         }
-        const docRef = db.collection('reflections').doc(id);
+        console.log('The reflection form is working on this route');
+        const docRef = db.collection('userid-reflections').doc(id);
         await docRef.set(reqData);
         console.log('New entry created with the id:', id);
         return res.json({
@@ -32,10 +71,10 @@ export const createReflection = async (req: Request, res: Response) => {
 };
 
 export const getGraphData = async (req: Request, res: Response) => {
-    const { name } = req.params;
+    const { userId } = req.params;
 
     try {
-        const reflectionsSnapshot = await db.collection('reflections').where('name', '==', name).orderBy('testDay').get();
+        const reflectionsSnapshot = await db.collection('userid-reflections').where('userId', '==', userId).get();
 
         let recordsArray = [];
 
@@ -166,6 +205,127 @@ export const getTwoPointerStatusToday = async (req: Request, res: Response) => {
         return res.status(500).json({
             success: false,
             message: 'An error occurred while getting two pointer status',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+export const getMNKUsers = async (req: Request, res: Response) => {
+    try {
+        const { mnkId } = req.params;
+
+        if (!mnkId) {
+            return res.status(400).json({
+                success: false,
+                message: 'MNK ID is required',
+            });
+        }
+
+        const mnkDoc = await db.collection('mnk').doc(mnkId).get();
+
+        if (!mnkDoc.exists) {
+            return res.status(404).json({
+                success: false,
+                message: 'MNK group not found',
+            });
+        }
+
+        const mnkData = mnkDoc.data();
+        const users = mnkData?.users || [];
+
+        return res.status(200).json({
+            success: true,
+            message: 'MNK users fetched successfully',
+            data: users,
+        });
+    } catch (error) {
+        console.log('there is an error at getMNKUser controller', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+interface UserDetail {
+    userId: string;
+    userName: string;
+}
+
+// export const getAllUsers = async (req: Request, res: Response) => {
+//     try {
+//         const userCollection = await db.collection('users').get();
+
+//         let mnkUsers: UserDetail[] = [];
+
+//         let count = 0;
+
+//         userCollection.docs.forEach((doc: any) => {
+//             console.log('This is the value of doc.data() ', doc.data());
+//             let { fullName, id } = doc.data();
+//             mnkUsers.push({ userName: fullName || '', userId: id || '' });
+//         });
+
+//         console.log('This is the value of mnkUSers ', mnkUsers);
+//         console.log('The value of the count is ', count);
+
+//         return res.status(201).json({
+//             message: 'This is working whatever it is',
+//             data: mnkUsers,
+//         });
+//     } catch (error) {
+//         console.log('there is an error at getMNKUser controller of admin router', error);
+//         return res.status(500).json({
+//             error: 'There is an internal servor error',
+//         });
+//     }
+// };
+
+export const sendMNKJoinRequest = async (req: Request, res: Response) => {
+    try {
+        const { groupId, userId, name, groupName } = req.body;
+
+        if (!groupId || !userId || !name || !groupName) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: groupId, userId, name, or groupName',
+            });
+        }
+
+        // Check if request already exists
+        const existingRequest = await db.collection('mnk-requests').where('userId', '==', userId).get();
+
+        if (!existingRequest.empty) {
+            return res.status(400).json({
+                success: false,
+                message: 'A request from this user for this group already exists',
+            });
+        }
+
+        // Create new request
+        const requestData = {
+            groupId,
+            userId,
+            name,
+            groupName,
+            status: 'pending', // pending, accepted, rejected
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+
+        await db.collection('mnk-requests').add(requestData);
+
+        return res.status(201).json({
+            success: true,
+            message: 'MNK join request sent successfully',
+            data: requestData,
+        });
+    } catch (error) {
+        console.error('Error in sendMNKJoinRequest:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while sending the join request',
             error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
