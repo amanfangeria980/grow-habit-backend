@@ -387,3 +387,155 @@ export const removeFromMNK = async (req: Request, res: Response) => {
         });
     }
 };
+
+export const usersEligibleForMNK = async (req: Request, res: Response) => {
+    try {
+        const usersRef = db.collection('users');
+        const querySnapshot = await usersRef.where('mnk', '==', null).get();
+
+        const eligibleUsers: any[] = [];
+        querySnapshot.forEach(doc => {
+            const userData = doc.data();
+            eligibleUsers.push({
+                id: userData.id,
+                fullName: userData.fullName,
+                email: userData.email,
+            });
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Successfully fetched eligible users',
+            data: eligibleUsers,
+        });
+    } catch (error) {
+        console.error('Error in usersEligibleForMNK:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+export const getMNKJoinRequests = async (req: Request, res: Response) => {
+    try {
+        const { mnkId } = req.params;
+
+        if (!mnkId) {
+            return res.status(400).json({
+                success: false,
+                message: 'MNK ID is required',
+            });
+        }
+
+        const requestsSnapshot = await db
+            .collection('mnk-requests')
+            .where('groupId', '==', mnkId)
+            .orderBy('createdAt', 'desc')
+            .get();
+
+        const requests: any[] = [];
+        requestsSnapshot.forEach(doc => {
+            requests.push({
+                id: doc.id,
+                ...doc.data(),
+            });
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Join requests fetched successfully',
+            requests,
+        });
+    } catch (error) {
+        console.error('Error in getMNKJoinRequests:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while fetching join requests',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};
+
+export const handleJoinRequest = async (req: Request, res: Response) => {
+    try {
+        const { requestId, action, userId, mnkId } = req.body;
+
+        if (!requestId || !action || !userId || !mnkId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields',
+            });
+        }
+
+        const requestRef = db.collection('mnk-requests').doc(requestId);
+        const requestDoc = await requestRef.get();
+
+        if (!requestDoc.exists) {
+            return res.status(404).json({
+                success: false,
+                message: 'Join request not found',
+            });
+        }
+
+        if (action === 'approve') {
+            // Add user to MNK group
+            const userRef = db.collection('users').doc(userId);
+            const mnkRef = db.collection('mnk').doc(mnkId);
+
+            const [userDoc, mnkDoc] = await Promise.all([userRef.get(), mnkRef.get()]);
+
+            if (!userDoc.exists || !mnkDoc.exists) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'User or MNK group not found',
+                });
+            }
+
+            const userData = userDoc.data();
+            const mnkData = mnkDoc.data();
+
+            const batch = db.batch();
+
+            // Update MNK group
+            batch.update(mnkRef, {
+                users: admin.firestore.FieldValue.arrayUnion({
+                    userId,
+                    name: userData?.fullName,
+                }),
+            });
+
+            // Update user
+            batch.update(userRef, {
+                mnk: { mnkId, mnkName: mnkData?.name },
+            });
+
+            // Update request status
+            batch.update(requestRef, {
+                status: 'approved',
+                updatedAt: new Date().toISOString(),
+            });
+
+            await batch.commit();
+        } else {
+            // Just update request status to rejected
+            await requestRef.update({
+                status: 'rejected',
+                updatedAt: new Date().toISOString(),
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: `Join request ${action}ed successfully`,
+        });
+    } catch (error) {
+        console.error('Error in handleJoinRequest:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'An error occurred while handling the join request',
+            error: error instanceof Error ? error.message : 'Unknown error',
+        });
+    }
+};

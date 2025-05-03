@@ -9,6 +9,10 @@ import {
     getMNKGroups,
     removeFromMNK,
     deleteMNK,
+    usersEligibleForMNK,
+    addToMNK,
+    getMNKJoinRequests,
+    handleJoinRequest,
 } from '../controllers/admin.controller';
 import db from '../../utils/firebase';
 
@@ -89,6 +93,23 @@ adminRouter.post('/remove-from-mnk', (req, res) => {
 
 adminRouter.post('/delete-mnk-group', (req, res) => {
     deleteMNK(req, res);
+});
+
+adminRouter.post('/add-to-mnk', (req, res) => {
+    addToMNK(req, res);
+});
+
+adminRouter.get('/users-eligible-for-mnk', (req, res) => {
+    usersEligibleForMNK(req, res);
+});
+
+// MNK Join Request Routes
+adminRouter.get('/mnk-join-requests/:mnkId', (req: Request, res: Response) => {
+    getMNKJoinRequests(req, res);
+});
+
+adminRouter.post('/mnk-join-request/handle', (req: Request, res: Response) => {
+    handleJoinRequest(req, res);
 });
 
 export default adminRouter;
