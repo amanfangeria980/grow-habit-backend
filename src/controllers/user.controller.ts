@@ -74,7 +74,7 @@ export const getGraphData = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
     try {
-        const reflectionsSnapshot = await db.collection('userid-reflections').where('userId', '==', userId).get();
+        const reflectionsSnapshot = await db.collection('reflections').where('userId', '==', userId).get();
 
         let recordsArray = [];
 
