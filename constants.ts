@@ -1,8 +1,6 @@
-export const allUsers: string[] = ['madhavi', 'deepika', 'parth', 'govindraju', 'kavya', 'rashmi', 'aditya', 'aman'];
+export const allUsers: string[] = ['deepika', 'aman', 'parth', 'kavya', 'sony'];
 
-export const templateMessageNumbers = [
-    919801801777, 917078609133, 919634033353, 919449870665, 918923520231, 918682059579, 918054077051,
-];
+export const templateMessageNumbers = [919449870665, 919801801777, 917078609133, 918923520231, 918549988903];
 
 export const normalMessageNumbers = [
     {
@@ -13,14 +11,14 @@ export const normalMessageNumbers = [
         name: 'Parth',
         number: 917078609133,
     },
-    {
-        name: 'Rashmi',
-        number: 919634033353,
-    },
-    {
-        name: 'Govindraju',
-        number: 919449870665,
-    },
+    // {
+    //     name: 'Rashmi',
+    //     number: 919634033353,
+    // },
+    // {
+    //     name: 'Govindraju',
+    //     number: 919449870665,
+    // },
     {
         name: 'Kavya',
         number: 918923520231,
@@ -30,9 +28,13 @@ export const normalMessageNumbers = [
         number: 918682059579,
     },
     {
-        name: 'Madhavi',
-        number: 918054077051,
+        name: 'Sony',
+        number: 918549988903,
     },
+    // {
+    //     name: 'Madhavi',
+    //     number: 918054077051,
+    // },
 ];
 
 export const motivationalQuotes = [
