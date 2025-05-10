@@ -7,6 +7,7 @@ import {
     getMNKUsers,
     getUserReflections,
     sendMNKJoinRequest,
+    addCustomValue,
 } from '../controllers/user.controller';
 import { getTwoPointerStatusToday } from '../controllers/user.controller';
 import { getUserDetails } from '../controllers/user.controller';
@@ -15,7 +16,7 @@ import { createHabit } from '../controllers/user.habit.controller';
 
 const userRouter = express.Router();
 
-// ****************************** All the below are user routes *****************************************************
+// ****************************** All the below are user routes ***** ************************************************
 
 // this route needs to be written and it's controller needs to be created
 userRouter.get('/get-user-details/:userId', (req: Request, res: Response) => {
@@ -24,6 +25,10 @@ userRouter.get('/get-user-details/:userId', (req: Request, res: Response) => {
 
 userRouter.post('/reflect', (req: Request, res: Response) => {
     createReflection(req, res);
+});
+
+userRouter.post('/add-custom-value', (req: Request, res: Response) => {
+    addCustomValue(req, res);
 });
 
 userRouter.get('/user-graph/:userId', (req: Request, res: Response) => {

@@ -70,6 +70,93 @@ export const createReflection = async (req: Request, res: Response) => {
     }
 };
 
+export const addCustomValue = async(req : Request, res : Response)=>{
+    try {
+        const { userId, name, value, unit } = req.body; 
+
+        if (!userId || !name || !value || !unit) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields',
+            });
+        }
+
+        if(userId === "")
+        {
+            return res.status(400).json({
+                success : false, 
+                message : "The userId is not valid", 
+            })
+        }
+
+        const userDoc = await db.collection('users').doc(userId).get();
+
+
+
+        if(!userDoc.exists){
+            return res.status(404).json({
+                success: false,
+                message: 'User not found',
+            });
+        }
+
+       
+
+        const userData = userDoc.data();  
+        // Check if secondaryHabit array exists and is empty
+        if (userData?.secondaryHabit && userData?.secondaryHabit.length === 0) {
+            const customId = nanoid(); // Generate unique ID for custom habit
+            
+            try {
+                await db.collection('users').doc(userId).update({
+                    secondaryHabit: [customId]
+                });
+
+                await db.collection('custom-value').doc(customId).set({
+                    userId: userId,
+                    name: name,
+                    value: value,
+                    unit: unit,
+                    createdAt: new Date(),
+                });
+
+
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Custom habit added successfully',
+                    data: {
+                        id: customId,
+                        name: name,
+                        value: value, 
+                        unit: unit
+                    }
+                });
+            } catch (error) {
+                console.error('Error updating user document:', error);
+                return res.status(500).json({
+                    success: false, 
+                    message: 'Error adding custom habit',
+                    error: error instanceof Error ? error.message : 'Unknown error'
+                });
+            }
+        }
+
+        return res.status(400).json({
+            message: "The custom value cannot be added", 
+            success: false, 
+        });
+    } 
+    catch (error) {
+        console.error('Error in addCustomValue:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+}
+
 export const getGraphData = async (req: Request, res: Response) => {
     const { userId } = req.params;
 
