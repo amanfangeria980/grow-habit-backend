@@ -8,6 +8,7 @@ import {
     getUserReflections,
     sendMNKJoinRequest,
     addCustomValue,
+    deleteCustomValue,
 } from '../controllers/user.controller';
 import { getTwoPointerStatusToday } from '../controllers/user.controller';
 import { getUserDetails } from '../controllers/user.controller';
@@ -29,6 +30,10 @@ userRouter.post('/reflect', (req: Request, res: Response) => {
 
 userRouter.post('/add-custom-value', (req: Request, res: Response) => {
     addCustomValue(req, res);
+});
+
+userRouter.delete('/delete-custom-value', (req: Request, res: Response) => {
+    deleteCustomValue(req, res);
 });
 
 userRouter.get('/user-graph/:userId', (req: Request, res: Response) => {

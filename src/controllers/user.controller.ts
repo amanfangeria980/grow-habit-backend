@@ -118,6 +118,7 @@ export const addCustomValue = async(req : Request, res : Response)=>{
                     value: value,
                     unit: unit,
                     createdAt: new Date(),
+                    id : customId
                 });
 
 
@@ -155,6 +156,85 @@ export const addCustomValue = async(req : Request, res : Response)=>{
             error: error instanceof Error ? error.message : 'Unknown error'
         });
     }
+}
+
+
+// this function is not working 
+export const deleteCustomValue = async(req : Request, res : Response)=>{
+   
+
+    const { userId, customId} = req.body; 
+
+    console.log("this is the value of userId", userId); 
+    console.log("this is the value of customId", customId); 
+
+    if(!userId || !customId || customId === ""){
+        return res.status(400).json({
+            success : false, 
+            message : "The userId and customId are required", 
+        })
+    }
+
+    try{
+
+   
+
+    const userDoc = await db.collection('users').doc(userId).get(); 
+
+    if(!userDoc.exists){
+        return res.status(404).json({
+            success : false, 
+            message : "The user is not found", 
+        })
+    }
+    
+
+    try {
+        const userData = userDoc.data();
+        
+        // Check if secondaryHabit array exists and is not empty
+        if (!userData?.secondaryHabit || userData.secondaryHabit.length === 0) {
+
+            return res.status(400).json({
+                success: false,
+                message: "No custom value exists to delete"
+            });
+        }
+
+        const batch = db.batch();
+        
+        batch.update(db.collection('users').doc(userId), {
+            secondaryHabit: []
+        });
+        
+        batch.delete(db.collection('custom-value').doc(customId));
+        
+        await batch.commit();
+
+        return res.status(200).json({
+            success: true,
+            message: "Custom value deleted successfully"
+        });
+
+    } catch (error) {
+        console.error('Error in deleteCustomValue:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error deleting custom value',
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+
+}
+catch(error){
+    console.error('Error in deleteCustomValue:', error);
+    return res.status(500).json({
+        success: false,
+        message: 'Error deleting custom value',
+        error: error instanceof Error ? error.message : 'Unknown error'
+    });
+}
+
 }
 
 export const getGraphData = async (req: Request, res: Response) => {
