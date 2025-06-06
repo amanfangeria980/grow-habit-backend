@@ -47,7 +47,7 @@ app.use(
 app.get('/', (req: Request, res: Response) => {
     console.log('Log: Serve is hit');
 
-    res.send('Welcome to the Grow Habit Backend!');
+    res.send('Welcome to the Grow Habit Backend!!!');
 });
 
 // Admin Routes
