@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import {
     createReflection,
-    // getAllUsers,
     getGraphData,
     getIdOfUser,
     getMNKUsers,
@@ -16,6 +15,7 @@ import { getTwoPointerStatusToday } from '../controllers/user.controller';
 import { getUserDetails } from '../controllers/user.controller';
 import { addToMNK } from '../controllers/admin.controller';
 import { createHabit } from '../controllers/user.habit.controller';
+import { updateIdealValue } from '../controllers/user.controller';
 
 const userRouter = express.Router();
 
@@ -42,6 +42,11 @@ userRouter.post('/add-custom-value', (req: Request, res: Response) => {
 
 userRouter.delete('/delete-custom-value', (req: Request, res: Response) => {
     deleteCustomValue(req, res);
+});
+
+userRouter.post('/update-ideal-value', (req: Request, res: Response) => {
+    console.log("this is the value of req.body", req.body); 
+    updateIdealValue(req, res);
 });
 
 userRouter.get('/get-custom-value-reflection/:secondaryHabitId', (req: Request, res: Response) => {

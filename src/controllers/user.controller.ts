@@ -270,6 +270,55 @@ export const addCustomValue = async(req : Request, res : Response)=>{
     }
 }
 
+export const updateIdealValue = async(req : Request, res : Response)=>{
+
+    console.log("this is the value of req.body", req.body); 
+
+    const {secondaryHabitId, idealValue} = req.body; 
+
+    if(!secondaryHabitId || !idealValue){
+
+        return res.status(400).json({
+            success : false, 
+            message : "The secondaryHabitId and idealValue are required", 
+        })
+    }
+
+    try {
+        // Check if entry exists in custom-value collection
+        const customValueDoc = await db.collection('custom-value')
+            .where('id', '==', secondaryHabitId)
+            .get();
+
+        if (customValueDoc.empty) {
+            return res.status(404).json({
+                success: false,
+                message: "No custom value found for this habit ID"
+            });
+        }
+
+        // Update the ideal value in the first matching document
+        const docRef = customValueDoc.docs[0].ref;
+        await docRef.update({
+            ideal : idealValue
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Custom value ideal updated successfully"
+        });
+
+    } catch (error) {
+        console.error('Error updating custom value:', error);
+        return res.status(500).json({
+            success: false,
+            message: "Error updating custom value",
+            error: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+}
+
+
 
 
 export const deleteCustomValue = async(req : Request, res : Response)=>{
@@ -396,6 +445,8 @@ catch(error){
 }
 
 }
+
+// custom values routes end here 
 
 export const getGraphData = async (req: Request, res: Response) => {
     const { userId } = req.params;
