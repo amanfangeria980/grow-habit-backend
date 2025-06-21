@@ -182,9 +182,9 @@ export const getCustomValue = async (req : Request, res : Response)=> {
 
 export const addCustomValue = async(req : Request, res : Response)=>{
     try {
-        const { userId, name, value, unit } = req.body; 
+        const { userId, name, value, unit, ideal  } = req.body; 
 
-        if (!userId || !name || !value || !unit) {
+        if (!userId || !name || !value || !unit || !ideal) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing required fields',
@@ -228,7 +228,8 @@ export const addCustomValue = async(req : Request, res : Response)=>{
                     value: value,
                     unit: unit,
                     createdAt: new Date(),
-                    id : customId
+                    id : customId,
+                    ideal : ideal
                 });
 
 
@@ -243,6 +244,7 @@ export const addCustomValue = async(req : Request, res : Response)=>{
                         unit: unit
                     }
                 });
+
             } catch (error) {
                 console.error('Error updating user document:', error);
                 return res.status(500).json({
