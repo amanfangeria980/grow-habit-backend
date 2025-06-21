@@ -20,7 +20,7 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
         try {
             // console.log("I was here");
             const dayYesterdayDoc = await db
-                .collection('userid-reflections')
+                .collection('reflections')
                 .where('name', '==', username)
                 .where('testDay', '==', day - 1)
                 .get();
@@ -50,7 +50,7 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
             }
 
             const dayBeforeYesterdayDoc = await db
-                .collection('userid-reflections')
+                .collection('reflections')
                 .where('name', '==', username)
                 .where('testDay', '==', day - 2)
                 .get();
@@ -104,7 +104,7 @@ export const getTwoPointerStatus = async (req: Request, res: Response) => {
 // Get all the reflections from the database
 export const getReflections = async (req: Request, res: Response) => {
     try {
-        const reflectionsSnapshot = await db.collection('userid-reflections').orderBy('testDay').get();
+        const reflectionsSnapshot = await db.collection('reflections').orderBy('testDay').get();
 
         let reflectionsData: any = [];
 
@@ -134,7 +134,7 @@ export const deleteReflection = async (req: Request, res: Response) => {
     console.log('This is the value of data from frontend ', data);
 
     try {
-        const targetDoc = await db.collection('userid-reflections').where('timestamp', '==', data.timestamp).get();
+        const targetDoc = await db.collection('reflections').where('timestamp', '==', data.timestamp).get();
 
         if (targetDoc.empty) {
             res.json({
@@ -146,7 +146,7 @@ export const deleteReflection = async (req: Request, res: Response) => {
         // Note : logically there should be only one entry for one field but still I am considering that there could be multiple and written the code for it
 
         targetDoc.forEach(async doc => {
-            await db.collection('userid-reflections').doc(doc.id).delete();
+            await db.collection('reflections').doc(doc.id).delete();
         });
 
         res.json({

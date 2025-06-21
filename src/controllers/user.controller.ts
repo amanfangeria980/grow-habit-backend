@@ -41,9 +41,11 @@ export const createReflection = async (req: Request, res: Response) => {
     const reqData = req.body;
     const id = nanoid();
     const { testDay, name } = reqData;
+    const { customNumber,secondaryHabitId, ...reqDataWithout} = reqData ; 
+
     try {
         const existingData = await db
-            .collection('userid-reflections')
+            .collection('reflections')
             .where('testDay', '==', testDay)
             .where('name', '==', name)
             .get();
@@ -53,9 +55,46 @@ export const createReflection = async (req: Request, res: Response) => {
                 message: `There is already data present at ${testDay} for the user: ${name}`,
             });
         }
-        console.log('The reflection form is working on this route');
-        const docRef = db.collection('userid-reflections').doc(id);
-        await docRef.set(reqData);
+
+
+        // it's debatable to keep it this way because a lot of times it can be unfilled | but then it becomes difficult to track the data | however for now I just want to keep it this way
+
+        // if(!customNumber || !secondaryHabitId)
+        // {
+        //     return res.status(400).json({
+        //         success: false,
+        //         message: 'The secondaryHabitid or customNumber is required',
+        //     });
+        // }
+
+        if(customNumber && secondaryHabitId)
+        {
+            try{
+
+            const customValueReflectionId = nanoid();
+            const customValueReflectionRef = db.collection('custom-value-reflection').doc(customValueReflectionId);
+            await customValueReflectionRef.set({
+                id: customValueReflectionId,
+                secondaryHabitId: secondaryHabitId,
+                customNumber: customNumber,
+                testDay: testDay,
+                testMonth: new Date().getMonth() + 1, // Adding 1 since getMonth() returns 0-11
+                testYear: new Date().getFullYear(),
+                timestamp: Date.now()
+            });
+        }
+        catch(error){
+
+            return res.status(500).json({
+                success: false,
+                message: 'An error occurred while saving the custom value reflection',
+                error: error instanceof Error ? error.message : 'Unknown error',
+            });
+        }
+        }
+
+        const docRef = db.collection('reflections').doc(id);
+        await docRef.set(reqDataWithout);
         console.log('New entry created with the id:', id);
         return res.json({
             message: 'Reflection saved successfully.',
@@ -69,6 +108,77 @@ export const createReflection = async (req: Request, res: Response) => {
         });
     }
 };
+
+
+// custom value routes 
+
+export const getCustomValue = async (req : Request, res : Response)=> { 
+
+    try{
+
+    const {secondaryHabitId} = req.params;
+
+    if(!secondaryHabitId)
+    {
+        return res.status(400).json({
+            success : false, 
+            message : "Missing required fields : secondaryHabitId"
+        })
+    }
+
+    if(secondaryHabitId === "")
+    {
+        return res.status(400).json({
+            success : false, 
+            message : "The secondaryHabitId is not valid"
+        })
+    }
+
+    const habitDoc = await db.collection('custom-value').doc(secondaryHabitId).get() ; 
+
+    if(!habitDoc.exists){
+        return res.status(404).json({
+            success : false, 
+            message : "User not found"
+        })
+    }
+
+    const habitData = habitDoc.data() ; 
+
+    if(!habitData)
+    {
+
+        return res.status(400).json({
+            success : true, 
+            data : {
+                secondaryHabit : null 
+            }
+        })
+
+    }
+    else
+    {
+        return res.status(400).json({
+            success : true , 
+            data : {
+                secondaryHabit : habitData
+            }
+        })
+    }
+
+    }
+    catch(error)
+    {
+        console.error("Error in getting custom value", error) ; 
+        return res.status(500).json({
+            success : false , 
+            message : "Internal server error", 
+            error : error instanceof Error ? error.message : 'Unknown error'
+        })
+    }
+
+}
+
 
 export const addCustomValue = async(req : Request, res : Response)=>{
     try {
@@ -159,7 +269,7 @@ export const addCustomValue = async(req : Request, res : Response)=>{
 }
 
 
-// this function is not working 
+
 export const deleteCustomValue = async(req : Request, res : Response)=>{
    
 
@@ -233,6 +343,54 @@ catch(error){
         message: 'Error deleting custom value',
         error: error instanceof Error ? error.message : 'Unknown error'
     });
+}
+
+}
+
+export const getCustomValueReflection = async(req : Request, res : Response)=>{
+
+    const {secondaryHabitId} = req.params; 
+
+    if(!secondaryHabitId){
+        return res.status(400).json({
+            success : false, 
+            message : "The secondaryHabitId is required", 
+        })
+    }
+
+    if(secondaryHabitId === "")
+    {
+        return res.status(400).json({
+            success : false, 
+            message : "The secondaryHabitId is not valid", 
+        })
+    }
+
+    try{
+
+    const customValueReflectionDoc = await db.collection('custom-value-reflection').where('secondaryHabitId', '==', secondaryHabitId).get(); 
+
+    if(customValueReflectionDoc.empty){
+        return res.status(404).json({
+            success : false, 
+            message : "The custom value reflection is not found", 
+        })
+    }
+
+    const customValueReflectionData = customValueReflectionDoc.docs.map((doc)=>doc.data()); 
+
+    return res.status(200).json({
+        success : true, 
+        data : customValueReflectionData, 
+    })
+}
+catch(error){
+    console.error('Error in getCustomValueReflection:', error);
+    return res.status(500).json({
+        success : false, 
+        message : "Internal server error", 
+        error : error instanceof Error ? error.message : 'Unknown error', 
+    })
 }
 
 }
